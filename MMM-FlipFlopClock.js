@@ -35,6 +35,7 @@ Module.register("MMM-FlipFlopClock", {
 			minutes: null,
 			seconds: null
 		};
+		this.isFirstRender = true;
 		
 		// Schedule update interval
 		this.scheduleUpdate();
@@ -211,9 +212,10 @@ Module.register("MMM-FlipFlopClock", {
 			}
 		}
 
-		// Only do a full DOM update if this is the first render (prevTime is null)
-		if (this.prevTime.hours === null) {
+		// Only do a full DOM update on first render
+		if (this.isFirstRender) {
 			this.updateDom(0);
+			this.isFirstRender = false;
 		}
 	},
 
@@ -232,8 +234,6 @@ Module.register("MMM-FlipFlopClock", {
 		const digit = document.getElementById(digitId);
 		
 		if (digit && digit.dataset.value !== newValue) {
-			const oldValue = digit.dataset.value;
-			
 			// Update the flip animation elements with the new value
 			const flipTop = digit.querySelector(".flip-digit-flip-top span");
 			const flipBottom = digit.querySelector(".flip-digit-flip-bottom span");
