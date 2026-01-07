@@ -12,11 +12,7 @@ Module.register("MMM-FlipFlopClock", {
 		showSeconds: true,
 		showDate: true,
 		dateFormat: "dddd, MMMM D, YYYY",
-		displayType: "both", // "digital", "analog", or "both"
 		size: "medium", // "small", "medium", "large"
-		digitColor: "#ffffff",
-		backgroundColor: "#333333",
-		borderColor: "#000000",
 	},
 
 	// Required scripts

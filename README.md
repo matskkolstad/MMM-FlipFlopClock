@@ -51,9 +51,6 @@ Add the module to the modules array in your `config/config.js` file:
 | `showDate` | `Boolean` | `true` | Display date above the clock |
 | `dateFormat` | `String` | `"dddd, MMMM D, YYYY"` | Date format (using Moment.js format) |
 | `size` | `String` | `"medium"` | Size of the clock: `"small"`, `"medium"`, or `"large"` |
-| `digitColor` | `String` | `"#ffffff"` | Color of the digits (currently not implemented) |
-| `backgroundColor` | `String` | `"#333333"` | Background color of the flip cards (currently not implemented) |
-| `borderColor` | `String` | `"#000000"` | Border color of the flip cards (currently not implemented) |
 
 ### Example Configuration
 
