@@ -246,15 +246,7 @@ Module.register("MMM-FlipFlopClock", {
 			// Add flip animation class to start the animation
 			digit.classList.add("flipping");
 			
-			// Update static bottom at 300ms when flip-bottom animation starts
-			// This ensures the bottom half doesn't show the new value prematurely
-			// The flip-bottom element (z-index: 2) covers static-bottom during animation
-			setTimeout(function() {
-				const bottom = digit.querySelector(".flip-digit-bottom span");
-				if (bottom) bottom.textContent = newValue;
-			}, 300);
-			
-			// Update the static top after animation completes
+			// Update both static elements after animation completes
 			// Duration: 600ms (matches CSS: flipTop 300ms + flipBottom 300ms with 300ms delay)
 			setTimeout(function() {
 				digit.classList.remove("flipping");
@@ -262,6 +254,10 @@ Module.register("MMM-FlipFlopClock", {
 				// Update static top with new value
 				const top = digit.querySelector(".flip-digit-top span");
 				if (top) top.textContent = newValue;
+				
+				// Update static bottom with new value
+				const bottom = digit.querySelector(".flip-digit-bottom span");
+				if (bottom) bottom.textContent = newValue;
 				
 				// Update data attribute
 				digit.dataset.value = newValue;
