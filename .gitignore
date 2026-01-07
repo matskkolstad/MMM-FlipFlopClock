@@ -69,3 +69,6 @@ jspm_packages/
 # Temporary files
 tmp/
 temp/
+
+# Test files
+test-animation.html
