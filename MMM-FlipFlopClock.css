@@ -1,0 +1,279 @@
+/* MMM-FlipFlopClock Styles */
+
+.flip-clock-wrapper {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	font-family: 'Roboto', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+	color: #fff;
+}
+
+.flip-date {
+	font-size: 24px;
+	margin-bottom: 20px;
+	text-align: center;
+	font-weight: 300;
+	letter-spacing: 2px;
+	text-transform: uppercase;
+	opacity: 0.8;
+}
+
+.flip-time-container {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 10px;
+}
+
+.flip-digit-pair {
+	display: flex;
+	gap: 5px;
+}
+
+.flip-digit {
+	position: relative;
+	display: inline-block;
+	width: 60px;
+	height: 90px;
+	perspective: 1000px;
+	border-radius: 6px;
+	overflow: hidden;
+	box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+}
+
+.flip-digit-top,
+.flip-digit-bottom,
+.flip-digit-flip {
+	position: absolute;
+	width: 100%;
+	height: 50%;
+	overflow: hidden;
+	background: linear-gradient(to bottom, #3a3a3a 0%, #2a2a2a 100%);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	box-sizing: border-box;
+}
+
+.flip-digit-top {
+	top: 0;
+	border-bottom: 1px solid #000;
+	border-radius: 6px 6px 0 0;
+	align-items: flex-end;
+}
+
+.flip-digit-bottom {
+	bottom: 0;
+	border-top: 1px solid #000;
+	border-radius: 0 0 6px 6px;
+	align-items: flex-start;
+}
+
+.flip-digit-top span,
+.flip-digit-bottom span {
+	font-size: 56px;
+	font-weight: bold;
+	line-height: 90px;
+	color: #fff;
+	text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
+}
+
+/* Flip animation elements */
+.flip-digit-flip {
+	z-index: 2;
+	opacity: 0;
+	pointer-events: none;
+}
+
+.flip-digit-flip-top {
+	top: 0;
+	transform-origin: bottom;
+	border-radius: 6px 6px 0 0;
+	border-bottom: 1px solid #000;
+	align-items: flex-end;
+}
+
+.flip-digit-flip-bottom {
+	bottom: 0;
+	transform-origin: top;
+	border-radius: 0 0 6px 6px;
+	border-top: 1px solid #000;
+	align-items: flex-start;
+}
+
+.flip-digit-flip span {
+	font-size: 56px;
+	font-weight: bold;
+	line-height: 90px;
+	color: #fff;
+	text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
+}
+
+/* Flipping animation */
+.flip-digit.flipping .flip-digit-flip-top {
+	opacity: 1;
+	animation: flipTop 0.3s ease-in;
+}
+
+.flip-digit.flipping .flip-digit-flip-bottom {
+	opacity: 1;
+	animation: flipBottom 0.3s ease-out 0.3s;
+}
+
+@keyframes flipTop {
+	0% {
+		transform: rotateX(0deg);
+	}
+	100% {
+		transform: rotateX(-90deg);
+	}
+}
+
+@keyframes flipBottom {
+	0% {
+		transform: rotateX(90deg);
+	}
+	100% {
+		transform: rotateX(0deg);
+	}
+}
+
+/* Separator (colon) */
+.flip-separator {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	margin: 0 10px;
+	height: 90px;
+}
+
+.flip-separator span {
+	font-size: 48px;
+	font-weight: bold;
+	color: #fff;
+	line-height: 0.6;
+	text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+/* AM/PM indicator */
+.flip-ampm {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	margin-left: 15px;
+	font-size: 24px;
+	font-weight: 300;
+	color: #fff;
+	text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+/* Size variants */
+.flip-clock-wrapper.small .flip-digit {
+	width: 40px;
+	height: 60px;
+}
+
+.flip-clock-wrapper.small .flip-digit-top span,
+.flip-clock-wrapper.small .flip-digit-bottom span,
+.flip-clock-wrapper.small .flip-digit-flip span {
+	font-size: 36px;
+	line-height: 60px;
+}
+
+.flip-clock-wrapper.small .flip-separator span {
+	font-size: 32px;
+}
+
+.flip-clock-wrapper.small .flip-date {
+	font-size: 18px;
+	margin-bottom: 15px;
+}
+
+.flip-clock-wrapper.small .flip-ampm {
+	font-size: 18px;
+}
+
+.flip-clock-wrapper.large .flip-digit {
+	width: 80px;
+	height: 120px;
+}
+
+.flip-clock-wrapper.large .flip-digit-top span,
+.flip-clock-wrapper.large .flip-digit-bottom span,
+.flip-clock-wrapper.large .flip-digit-flip span {
+	font-size: 76px;
+	line-height: 120px;
+}
+
+.flip-clock-wrapper.large .flip-separator span {
+	font-size: 64px;
+}
+
+.flip-clock-wrapper.large .flip-date {
+	font-size: 32px;
+	margin-bottom: 25px;
+}
+
+.flip-clock-wrapper.large .flip-ampm {
+	font-size: 32px;
+}
+
+/* Add subtle glow effect */
+.flip-digit::before {
+	content: '';
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background: linear-gradient(to bottom, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0) 50%, rgba(0, 0, 0, 0.2) 50%, rgba(0, 0, 0, 0.1) 100%);
+	pointer-events: none;
+	border-radius: 6px;
+}
+
+/* Add shine effect on flip */
+.flip-digit.flipping::after {
+	content: '';
+	position: absolute;
+	top: 0;
+	left: -100%;
+	width: 100%;
+	height: 100%;
+	background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+	animation: shine 0.6s ease-in-out;
+	pointer-events: none;
+}
+
+@keyframes shine {
+	0% {
+		left: -100%;
+	}
+	100% {
+		left: 100%;
+	}
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+	.flip-digit {
+		width: 50px;
+		height: 75px;
+	}
+	
+	.flip-digit-top span,
+	.flip-digit-bottom span,
+	.flip-digit-flip span {
+		font-size: 46px;
+		line-height: 75px;
+	}
+	
+	.flip-separator span {
+		font-size: 38px;
+	}
+	
+	.flip-date {
+		font-size: 20px;
+	}
+}
