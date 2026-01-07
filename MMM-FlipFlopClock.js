@@ -243,20 +243,18 @@ Module.register("MMM-FlipFlopClock", {
 			if (flipTop) flipTop.textContent = oldValue;
 			if (flipBottom) flipBottom.textContent = newValue;
 			
-			// Update static bottom to NEW value (will be revealed when flip completes)
-			const bottom = digit.querySelector(".flip-digit-bottom span");
-			if (bottom) bottom.textContent = newValue;
-			
 			// Add flip animation class
 			digit.classList.add("flipping");
 			
-			// Update the static top after animation completes
+			// Update the static halves after animation completes
 			setTimeout(function() {
 				digit.classList.remove("flipping");
 				
-				// Update the static top with new value
+				// Update both static top and bottom with new value
 				const top = digit.querySelector(".flip-digit-top span");
+				const bottom = digit.querySelector(".flip-digit-bottom span");
 				if (top) top.textContent = newValue;
+				if (bottom) bottom.textContent = newValue;
 				
 				// Update data attribute
 				digit.dataset.value = newValue;
