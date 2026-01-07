@@ -247,6 +247,7 @@ Module.register("MMM-FlipFlopClock", {
 			digit.classList.add("flipping");
 			
 			// Update the static halves after animation completes
+			// Duration: 600ms (matches CSS: flipTop 300ms + flipBottom 300ms with 300ms delay)
 			setTimeout(function() {
 				digit.classList.remove("flipping");
 				
