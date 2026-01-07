@@ -1,0 +1,24 @@
+{
+  "name": "mmm-flipflopclock",
+  "version": "1.0.0",
+  "description": "A beautiful flip clock module for MagicMirror²",
+  "main": "MMM-FlipFlopClock.js",
+  "keywords": [
+    "MagicMirror",
+    "module",
+    "clock",
+    "flip clock",
+    "time",
+    "date"
+  ],
+  "author": "Mats Kjoshagen Kolstad",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/matskkolstad/MMM-FlipFlopClock.git"
+  },
+  "bugs": {
+    "url": "https://github.com/matskkolstad/MMM-FlipFlopClock/issues"
+  },
+  "homepage": "https://github.com/matskkolstad/MMM-FlipFlopClock#readme"
+}
