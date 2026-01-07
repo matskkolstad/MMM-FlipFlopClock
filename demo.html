@@ -389,6 +389,7 @@
         class FlipClock {
             constructor(elementId, config) {
                 this.element = document.getElementById(elementId);
+                this.elementId = elementId;
                 this.config = Object.assign({
                     timeFormat: 24,
                     showSeconds: true,
@@ -396,6 +397,8 @@
                     dateFormat: "dddd, MMMM D, YYYY"
                 }, config);
                 this.prevTime = { hours: null, minutes: null, seconds: null };
+                this.isFirstRender = true;
+                this.digitIdCounter = 0;
                 this.init();
             }
 
@@ -410,18 +413,87 @@
                 const minutes = time.format("mm");
                 const seconds = time.format("ss");
 
-                // Check if update needed
-                if (hours !== this.prevTime.hours || 
-                    minutes !== this.prevTime.minutes || 
-                    seconds !== this.prevTime.seconds) {
-                    
+                // On first render, build the DOM
+                if (this.isFirstRender) {
                     this.render(time, hours, minutes, seconds);
                     this.prevTime = { hours, minutes, seconds };
+                    this.isFirstRender = false;
+                    return;
+                }
+
+                // Check if update needed and animate
+                if (hours !== this.prevTime.hours) {
+                    this.flipDigitPair(hours, "hours");
+                }
+                if (minutes !== this.prevTime.minutes) {
+                    this.flipDigitPair(minutes, "minutes");
+                }
+                if (this.config.showSeconds && seconds !== this.prevTime.seconds) {
+                    this.flipDigitPair(seconds, "seconds");
+                }
+
+                // Update AM/PM
+                if (this.config.timeFormat === 12) {
+                    const ampmElement = this.element.querySelector(".flip-ampm");
+                    if (ampmElement) {
+                        ampmElement.textContent = time.format("A");
+                    }
+                }
+
+                this.prevTime = { hours, minutes, seconds };
+            }
+
+            flipDigitPair(newValue, unit) {
+                const digit1 = newValue.toString().charAt(0);
+                const digit2 = newValue.toString().charAt(1);
+                
+                this.flipSingleDigit(digit1, unit + "-1");
+                this.flipSingleDigit(digit2, unit + "-2");
+            }
+
+            flipSingleDigit(newValue, id) {
+                const digitId = this.elementId + "-" + id;
+                const digit = document.getElementById(digitId);
+                
+                if (digit && digit.dataset.value !== newValue) {
+                    const oldValue = digit.dataset.value;
+                    
+                    // Update flip animation elements: top shows OLD value, bottom shows NEW value
+                    const flipTop = digit.querySelector(".flip-digit-flip-top span");
+                    const flipBottom = digit.querySelector(".flip-digit-flip-bottom span");
+                    
+                    if (flipTop) flipTop.textContent = oldValue;
+                    if (flipBottom) flipBottom.textContent = newValue;
+                    
+                    // Add flip animation class to start the animation
+                    digit.classList.add("flipping");
+                    
+                    // Update static bottom at 300ms when flip-bottom animation starts
+                    // This ensures the bottom half doesn't show the new value prematurely
+                    // The flip-bottom element (z-index: 2) covers static-bottom during animation
+                    setTimeout(function() {
+                        const bottom = digit.querySelector(".flip-digit-bottom span");
+                        if (bottom) bottom.textContent = newValue;
+                    }, 300);
+                    
+                    // Update the static top after animation completes
+                    // Duration: 600ms (matches CSS: flipTop 300ms + flipBottom 300ms with 300ms delay)
+                    setTimeout(function() {
+                        digit.classList.remove("flipping");
+                        
+                        // Update static top with new value
+                        const top = digit.querySelector(".flip-digit-top span");
+                        if (top) top.textContent = newValue;
+                        
+                        // Update data attribute
+                        digit.dataset.value = newValue;
+                    }, 600);
                 }
             }
 
             render(time, hours, minutes, seconds) {
                 this.element.innerHTML = '';
+                this.digitIdCounter = 0;
 
                 // Date
                 if (this.config.showDate) {
@@ -436,16 +508,16 @@
                 timeDiv.className = "flip-time-container";
 
                 // Hours
-                timeDiv.appendChild(this.createFlipDigitPair(hours));
+                timeDiv.appendChild(this.createFlipDigitPair(hours, "hours"));
                 timeDiv.appendChild(this.createSeparator());
 
                 // Minutes
-                timeDiv.appendChild(this.createFlipDigitPair(minutes));
+                timeDiv.appendChild(this.createFlipDigitPair(minutes, "minutes"));
 
                 // Seconds
                 if (this.config.showSeconds) {
                     timeDiv.appendChild(this.createSeparator());
-                    timeDiv.appendChild(this.createFlipDigitPair(seconds));
+                    timeDiv.appendChild(this.createFlipDigitPair(seconds, "seconds"));
                 }
 
                 // AM/PM
@@ -459,22 +531,24 @@
                 this.element.appendChild(timeDiv);
             }
 
-            createFlipDigitPair(value) {
+            createFlipDigitPair(value, unit) {
                 const container = document.createElement("div");
                 container.className = "flip-digit-pair";
                 
                 const digit1 = value.toString().charAt(0);
                 const digit2 = value.toString().charAt(1);
 
-                container.appendChild(this.createFlipDigit(digit1));
-                container.appendChild(this.createFlipDigit(digit2));
+                container.appendChild(this.createFlipDigit(digit1, unit + "-1"));
+                container.appendChild(this.createFlipDigit(digit2, unit + "-2"));
 
                 return container;
             }
 
-            createFlipDigit(value) {
+            createFlipDigit(value, id) {
                 const digit = document.createElement("div");
                 digit.className = "flip-digit";
+                digit.id = this.elementId + "-" + id;
+                digit.dataset.value = value;
 
                 const top = document.createElement("div");
                 top.className = "flip-digit-top";

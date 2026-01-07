@@ -243,14 +243,16 @@ Module.register("MMM-FlipFlopClock", {
 			if (flipTop) flipTop.textContent = oldValue;
 			if (flipBottom) flipBottom.textContent = newValue;
 			
-			// Update static bottom to NEW value BEFORE animation starts
-			// This is safe because it's hidden behind the flip elements during animation
-			// When flip-bottom rotates to reveal the bottom half, it will show the new value
-			const bottom = digit.querySelector(".flip-digit-bottom span");
-			if (bottom) bottom.textContent = newValue;
-			
-			// Add flip animation class
+			// Add flip animation class to start the animation
 			digit.classList.add("flipping");
+			
+			// Update static bottom at 300ms when flip-bottom animation starts
+			// This ensures the bottom half doesn't show the new value prematurely
+			// The flip-bottom element (z-index: 2) covers static-bottom during animation
+			setTimeout(function() {
+				const bottom = digit.querySelector(".flip-digit-bottom span");
+				if (bottom) bottom.textContent = newValue;
+			}, 300);
 			
 			// Update the static top after animation completes
 			// Duration: 600ms (matches CSS: flipTop 300ms + flipBottom 300ms with 300ms delay)
