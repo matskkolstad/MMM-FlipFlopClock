@@ -153,23 +153,32 @@
             top: 0;
             border-bottom: 1px solid #000;
             border-radius: 6px 6px 0 0;
-            align-items: flex-end;
         }
 
         .flip-digit-bottom {
             bottom: 0;
             border-top: 1px solid #000;
             border-radius: 0 0 6px 6px;
-            align-items: flex-start;
         }
 
         .flip-digit-top span,
         .flip-digit-bottom span {
+            position: absolute;
+            width: 100%;
             font-size: 56px;
             font-weight: bold;
             line-height: 90px;
             color: #fff;
             text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
+            left: 0;
+        }
+
+        .flip-digit-top span {
+            top: 0;
+        }
+
+        .flip-digit-bottom span {
+            top: -45px;
         }
 
         .flip-digit-flip {
@@ -183,7 +192,6 @@
             transform-origin: bottom;
             border-radius: 6px 6px 0 0;
             border-bottom: 1px solid #000;
-            align-items: flex-end;
         }
 
         .flip-digit-flip-bottom {
@@ -191,15 +199,25 @@
             transform-origin: top;
             border-radius: 0 0 6px 6px;
             border-top: 1px solid #000;
-            align-items: flex-start;
         }
 
         .flip-digit-flip span {
+            position: absolute;
+            width: 100%;
             font-size: 56px;
             font-weight: bold;
             line-height: 90px;
             color: #fff;
             text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
+            left: 0;
+        }
+
+        .flip-digit-flip-top span {
+            top: 0;
+        }
+
+        .flip-digit-flip-bottom span {
+            top: -45px;
         }
 
         .flip-digit.flipping .flip-digit-flip-top {
@@ -264,6 +282,11 @@
             line-height: 60px;
         }
 
+        .flip-clock-wrapper.small .flip-digit-bottom span,
+        .flip-clock-wrapper.small .flip-digit-flip-bottom span {
+            top: -30px;
+        }
+
         .flip-clock-wrapper.small .flip-separator span {
             font-size: 32px;
         }
@@ -287,6 +310,11 @@
         .flip-clock-wrapper.large .flip-digit-flip span {
             font-size: 76px;
             line-height: 120px;
+        }
+
+        .flip-clock-wrapper.large .flip-digit-bottom span,
+        .flip-clock-wrapper.large .flip-digit-flip-bottom span {
+            top: -60px;
         }
 
         .flip-clock-wrapper.large .flip-separator span {
