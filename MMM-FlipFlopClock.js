@@ -203,8 +203,18 @@ Module.register("MMM-FlipFlopClock", {
 			this.flipDigitPair(seconds, "seconds");
 		}
 
-		// Full update of DOM
-		this.updateDom(0);
+		// Update AM/PM if using 12-hour format (no animation needed)
+		if (this.config.timeFormat === 12) {
+			const ampmElement = document.querySelector("#" + this.identifier + " .flip-ampm");
+			if (ampmElement) {
+				ampmElement.textContent = this.time.format("A");
+			}
+		}
+
+		// Only do a full DOM update if this is the first render (prevTime is null)
+		if (this.prevTime.hours === null) {
+			this.updateDom(0);
+		}
 	},
 
 	// Flip a pair of digits
@@ -222,12 +232,31 @@ Module.register("MMM-FlipFlopClock", {
 		const digit = document.getElementById(digitId);
 		
 		if (digit && digit.dataset.value !== newValue) {
+			const oldValue = digit.dataset.value;
+			
+			// Update the flip animation elements with the new value
+			const flipTop = digit.querySelector(".flip-digit-flip-top span");
+			const flipBottom = digit.querySelector(".flip-digit-flip-bottom span");
+			
+			if (flipTop) flipTop.textContent = newValue;
+			if (flipBottom) flipBottom.textContent = newValue;
+			
 			// Add flip animation class
 			digit.classList.add("flipping");
 			
-			// Remove class after animation
+			// Update the static parts after animation completes
 			setTimeout(function() {
 				digit.classList.remove("flipping");
+				
+				// Update the static top and bottom with new value
+				const top = digit.querySelector(".flip-digit-top span");
+				const bottom = digit.querySelector(".flip-digit-bottom span");
+				
+				if (top) top.textContent = newValue;
+				if (bottom) bottom.textContent = newValue;
+				
+				// Update data attribute
+				digit.dataset.value = newValue;
 			}, 600);
 		}
 	}
