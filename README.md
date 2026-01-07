@@ -2,7 +2,7 @@
 
 A beautiful, classic flip clock module for MagicMirror². This module displays the current time with an elegant flip animation, reminiscent of vintage flip clocks.
 
-![Flip Clock Preview](screenshots/preview.png)
+![Flip Clock Preview](https://github.com/user-attachments/assets/08bdf0a7-cc01-480f-b69f-7c950d50ca10)
 
 ## Features
 
@@ -107,17 +107,14 @@ See the [Moment.js documentation](https://momentjs.com/docs/#/displaying/format/
 
 ## Screenshots
 
-### Large Size with Date
-![Large Clock](screenshots/large.png)
+The screenshot above shows all the different configurations available:
 
-### Medium Size (Default)
-![Medium Clock](screenshots/medium.png)
+- **Large Size with Date (24-hour)** - Perfect for a main display with full date information
+- **Medium Size (Default)** - Balanced size with date display
+- **Small Size without Date** - Compact time-only display
+- **12-Hour Format with AM/PM** - Classic 12-hour format with AM/PM indicator
 
-### Small Size without Date
-![Small Clock](screenshots/small.png)
-
-### 12-Hour Format with AM/PM
-![12-Hour Format](screenshots/12hour.png)
+All sizes feature the classic flip clock design with smooth animations between time changes.
 
 ## Styling
 

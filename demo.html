@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MMM-FlipFlopClock Demo</title>
+    <!-- Moment.js alternative: use built-in Date API -->
+    <script>
+        // Simple date formatting helper
+        const formatDate = {
+            format: function(date, format) {
+                const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+                const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+                
+                const day = days[date.getDay()];
+                const month = months[date.getMonth()];
+                const dateNum = date.getDate();
+                const year = date.getFullYear();
+                
+                if (format === "dddd, MMMM D, YYYY") {
+                    return `${day}, ${month} ${dateNum}, ${year}`;
+                } else if (format === "MMMM D, YYYY") {
+                    return `${month} ${dateNum}, ${year}`;
+                } else if (format === "dddd, MMMM D") {
+                    return `${day}, ${month} ${dateNum}`;
+                }
+                return `${day}, ${month} ${dateNum}, ${year}`;
+            },
+            pad: function(num) {
+                return num < 10 ? '0' + num : num.toString();
+            }
+        };
+
+        const moment = function() {
+            const date = new Date();
+            return {
+                format: function(fmt) {
+                    if (fmt === "HH") return formatDate.pad(date.getHours());
+                    if (fmt === "hh") {
+                        let h = date.getHours() % 12;
+                        if (h === 0) h = 12;
+                        return formatDate.pad(h);
+                    }
+                    if (fmt === "mm") return formatDate.pad(date.getMinutes());
+                    if (fmt === "ss") return formatDate.pad(date.getSeconds());
+                    if (fmt === "A") return date.getHours() >= 12 ? "PM" : "AM";
+                    return formatDate.format(date, fmt);
+                }
+            };
+        };
+    </script>
+    <style>
+        body {
+            margin: 0;
+            padding: 40px;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Roboto', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+        }
+
+        h1 {
+            color: white;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: 300;
+            letter-spacing: 3px;
+        }
+
+        .demo-container {
+            display: flex;
+            flex-direction: column;
+            gap: 60px;
+            align-items: center;
+        }
+
+        .demo-section {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .demo-label {
+            color: white;
+            text-align: center;
+            margin-bottom: 15px;
+            font-size: 18px;
+            font-weight: 300;
+            opacity: 0.8;
+        }
+
+        /* Import the flip clock styles */
+        .flip-clock-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-family: 'Roboto', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            color: #fff;
+        }
+
+        .flip-date {
+            font-size: 24px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: 300;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            opacity: 0.8;
+        }
+
+        .flip-time-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .flip-digit-pair {
+            display: flex;
+            gap: 5px;
+        }
+
+        .flip-digit {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 90px;
+            perspective: 1000px;
+            border-radius: 6px;
+            overflow: hidden;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+        }
+
+        .flip-digit-top,
+        .flip-digit-bottom,
+        .flip-digit-flip {
+            position: absolute;
+            width: 100%;
+            height: 50%;
+            overflow: hidden;
+            background: linear-gradient(to bottom, #3a3a3a 0%, #2a2a2a 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-sizing: border-box;
+        }
+
+        .flip-digit-top {
+            top: 0;
+            border-bottom: 1px solid #000;
+            border-radius: 6px 6px 0 0;
+            align-items: flex-end;
+        }
+
+        .flip-digit-bottom {
+            bottom: 0;
+            border-top: 1px solid #000;
+            border-radius: 0 0 6px 6px;
+            align-items: flex-start;
+        }
+
+        .flip-digit-top span,
+        .flip-digit-bottom span {
+            font-size: 56px;
+            font-weight: bold;
+            line-height: 90px;
+            color: #fff;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
+        }
+
+        .flip-digit-flip {
+            z-index: 2;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .flip-digit-flip-top {
+            top: 0;
+            transform-origin: bottom;
+            border-radius: 6px 6px 0 0;
+            border-bottom: 1px solid #000;
+            align-items: flex-end;
+        }
+
+        .flip-digit-flip-bottom {
+            bottom: 0;
+            transform-origin: top;
+            border-radius: 0 0 6px 6px;
+            border-top: 1px solid #000;
+            align-items: flex-start;
+        }
+
+        .flip-digit-flip span {
+            font-size: 56px;
+            font-weight: bold;
+            line-height: 90px;
+            color: #fff;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
+        }
+
+        .flip-digit.flipping .flip-digit-flip-top {
+            opacity: 1;
+            animation: flipTop 0.3s ease-in;
+        }
+
+        .flip-digit.flipping .flip-digit-flip-bottom {
+            opacity: 1;
+            animation: flipBottom 0.3s ease-out 0.3s;
+        }
+
+        @keyframes flipTop {
+            0% { transform: rotateX(0deg); }
+            100% { transform: rotateX(-90deg); }
+        }
+
+        @keyframes flipBottom {
+            0% { transform: rotateX(90deg); }
+            100% { transform: rotateX(0deg); }
+        }
+
+        .flip-separator {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            margin: 0 10px;
+            height: 90px;
+        }
+
+        .flip-separator span {
+            font-size: 48px;
+            font-weight: bold;
+            color: #fff;
+            line-height: 0.6;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .flip-ampm {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            margin-left: 15px;
+            font-size: 24px;
+            font-weight: 300;
+            color: #fff;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Size variants */
+        .flip-clock-wrapper.small .flip-digit {
+            width: 40px;
+            height: 60px;
+        }
+
+        .flip-clock-wrapper.small .flip-digit-top span,
+        .flip-clock-wrapper.small .flip-digit-bottom span,
+        .flip-clock-wrapper.small .flip-digit-flip span {
+            font-size: 36px;
+            line-height: 60px;
+        }
+
+        .flip-clock-wrapper.small .flip-separator span {
+            font-size: 32px;
+        }
+
+        .flip-clock-wrapper.small .flip-date {
+            font-size: 18px;
+            margin-bottom: 15px;
+        }
+
+        .flip-clock-wrapper.small .flip-ampm {
+            font-size: 18px;
+        }
+
+        .flip-clock-wrapper.large .flip-digit {
+            width: 80px;
+            height: 120px;
+        }
+
+        .flip-clock-wrapper.large .flip-digit-top span,
+        .flip-clock-wrapper.large .flip-digit-bottom span,
+        .flip-clock-wrapper.large .flip-digit-flip span {
+            font-size: 76px;
+            line-height: 120px;
+        }
+
+        .flip-clock-wrapper.large .flip-separator span {
+            font-size: 64px;
+        }
+
+        .flip-clock-wrapper.large .flip-date {
+            font-size: 32px;
+            margin-bottom: 25px;
+        }
+
+        .flip-clock-wrapper.large .flip-ampm {
+            font-size: 32px;
+        }
+
+        .flip-digit::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(to bottom, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0) 50%, rgba(0, 0, 0, 0.2) 50%, rgba(0, 0, 0, 0.1) 100%);
+            pointer-events: none;
+            border-radius: 6px;
+        }
+
+        .flip-digit.flipping::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            animation: shine 0.6s ease-in-out;
+            pointer-events: none;
+        }
+
+        @keyframes shine {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+    </style>
+</head>
+<body>
+    <h1>MMM-FlipFlopClock Demo</h1>
+    
+    <div class="demo-container">
+        <div class="demo-section">
+            <div class="demo-label">Large Size with Date (24-hour)</div>
+            <div id="clock-large" class="flip-clock-wrapper large"></div>
+        </div>
+
+        <div class="demo-section">
+            <div class="demo-label">Medium Size (Default)</div>
+            <div id="clock-medium" class="flip-clock-wrapper medium"></div>
+        </div>
+
+        <div class="demo-section">
+            <div class="demo-label">Small Size without Date</div>
+            <div id="clock-small" class="flip-clock-wrapper small"></div>
+        </div>
+
+        <div class="demo-section">
+            <div class="demo-label">12-Hour Format with AM/PM</div>
+            <div id="clock-12hour" class="flip-clock-wrapper medium"></div>
+        </div>
+    </div>
+
+    <script>
+        class FlipClock {
+            constructor(elementId, config) {
+                this.element = document.getElementById(elementId);
+                this.config = Object.assign({
+                    timeFormat: 24,
+                    showSeconds: true,
+                    showDate: true,
+                    dateFormat: "dddd, MMMM D, YYYY"
+                }, config);
+                this.prevTime = { hours: null, minutes: null, seconds: null };
+                this.init();
+            }
+
+            init() {
+                this.update();
+                setInterval(() => this.update(), 1000);
+            }
+
+            update() {
+                const time = moment();
+                const hours = this.config.timeFormat === 12 ? time.format("hh") : time.format("HH");
+                const minutes = time.format("mm");
+                const seconds = time.format("ss");
+
+                // Check if update needed
+                if (hours !== this.prevTime.hours || 
+                    minutes !== this.prevTime.minutes || 
+                    seconds !== this.prevTime.seconds) {
+                    
+                    this.render(time, hours, minutes, seconds);
+                    this.prevTime = { hours, minutes, seconds };
+                }
+            }
+
+            render(time, hours, minutes, seconds) {
+                this.element.innerHTML = '';
+
+                // Date
+                if (this.config.showDate) {
+                    const dateDiv = document.createElement("div");
+                    dateDiv.className = "flip-date";
+                    dateDiv.textContent = time.format(this.config.dateFormat);
+                    this.element.appendChild(dateDiv);
+                }
+
+                // Time container
+                const timeDiv = document.createElement("div");
+                timeDiv.className = "flip-time-container";
+
+                // Hours
+                timeDiv.appendChild(this.createFlipDigitPair(hours));
+                timeDiv.appendChild(this.createSeparator());
+
+                // Minutes
+                timeDiv.appendChild(this.createFlipDigitPair(minutes));
+
+                // Seconds
+                if (this.config.showSeconds) {
+                    timeDiv.appendChild(this.createSeparator());
+                    timeDiv.appendChild(this.createFlipDigitPair(seconds));
+                }
+
+                // AM/PM
+                if (this.config.timeFormat === 12) {
+                    const ampm = document.createElement("div");
+                    ampm.className = "flip-ampm";
+                    ampm.textContent = time.format("A");
+                    timeDiv.appendChild(ampm);
+                }
+
+                this.element.appendChild(timeDiv);
+            }
+
+            createFlipDigitPair(value) {
+                const container = document.createElement("div");
+                container.className = "flip-digit-pair";
+                
+                const digit1 = value.toString().charAt(0);
+                const digit2 = value.toString().charAt(1);
+
+                container.appendChild(this.createFlipDigit(digit1));
+                container.appendChild(this.createFlipDigit(digit2));
+
+                return container;
+            }
+
+            createFlipDigit(value) {
+                const digit = document.createElement("div");
+                digit.className = "flip-digit";
+
+                const top = document.createElement("div");
+                top.className = "flip-digit-top";
+                top.innerHTML = `<span>${value}</span>`;
+
+                const bottom = document.createElement("div");
+                bottom.className = "flip-digit-bottom";
+                bottom.innerHTML = `<span>${value}</span>`;
+
+                const flipTop = document.createElement("div");
+                flipTop.className = "flip-digit-flip flip-digit-flip-top";
+                flipTop.innerHTML = `<span>${value}</span>`;
+
+                const flipBottom = document.createElement("div");
+                flipBottom.className = "flip-digit-flip flip-digit-flip-bottom";
+                flipBottom.innerHTML = `<span>${value}</span>`;
+
+                digit.appendChild(top);
+                digit.appendChild(flipTop);
+                digit.appendChild(flipBottom);
+                digit.appendChild(bottom);
+
+                return digit;
+            }
+
+            createSeparator() {
+                const separator = document.createElement("div");
+                separator.className = "flip-separator";
+                separator.innerHTML = "<span>:</span>";
+                return separator;
+            }
+        }
+
+        // Initialize clocks
+        new FlipClock('clock-large', {
+            timeFormat: 24,
+            showSeconds: true,
+            showDate: true,
+            dateFormat: "dddd, MMMM D, YYYY"
+        });
+
+        new FlipClock('clock-medium', {
+            timeFormat: 24,
+            showSeconds: true,
+            showDate: true,
+            dateFormat: "MMMM D, YYYY"
+        });
+
+        new FlipClock('clock-small', {
+            timeFormat: 24,
+            showSeconds: false,
+            showDate: false
+        });
+
+        new FlipClock('clock-12hour', {
+            timeFormat: 12,
+            showSeconds: true,
+            showDate: true,
+            dateFormat: "dddd, MMMM D"
+        });
+    </script>
+</body>
+</html>
