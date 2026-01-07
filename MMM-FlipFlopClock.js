@@ -247,7 +247,7 @@ Module.register("MMM-FlipFlopClock", {
 			digit.classList.add("flipping");
 			
 			// Update both static elements after animation completes
-			// Duration: 1200ms (matches CSS: flipTop 600ms + flipBottom 600ms with 600ms delay)
+			// Duration: 600ms (matches CSS: flipTop 300ms + flipBottom 300ms with 300ms delay)
 			setTimeout(function() {
 				digit.classList.remove("flipping");
 				
@@ -261,7 +261,7 @@ Module.register("MMM-FlipFlopClock", {
 				
 				// Update data attribute
 				digit.dataset.value = newValue;
-			}, 1200);
+			}, 600);
 		}
 	}
 });
