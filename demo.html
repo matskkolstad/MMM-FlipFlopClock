@@ -464,6 +464,30 @@
                 opacity: 1;
             }
         }
+
+        /* Vertical orientation */
+        .flip-clock-wrapper.orientation-vertical {
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .flip-clock-wrapper.orientation-vertical .flip-time-container {
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .flip-clock-wrapper.orientation-vertical .flip-separator {
+            display: none;
+        }
+
+        .flip-clock-wrapper.orientation-vertical .flip-digit-pair {
+            justify-content: center;
+        }
+
+        .flip-clock-wrapper.orientation-vertical .flip-ampm {
+            margin-left: 0;
+            margin-top: 15px;
+        }
     </style>
 </head>
 <body>
@@ -471,33 +495,33 @@
     
     <div class="demo-container">
         <div class="demo-section">
-            <div class="demo-label">Flip Animation (Default)</div>
-            <div id="clock-flip" class="flip-clock-wrapper medium"></div>
+            <div class="demo-label">Large Size - Horizontal (Default)</div>
+            <div id="clock-large" class="flip-clock-wrapper large"></div>
         </div>
 
         <div class="demo-section">
-            <div class="demo-label">Fade Animation</div>
-            <div id="clock-fade" class="flip-clock-wrapper medium"></div>
+            <div class="demo-label">Medium Size - Horizontal with Date</div>
+            <div id="clock-medium" class="flip-clock-wrapper medium"></div>
         </div>
 
         <div class="demo-section">
-            <div class="demo-label">Slide Animation</div>
-            <div id="clock-slide" class="flip-clock-wrapper medium"></div>
+            <div class="demo-label">Small Size - Horizontal</div>
+            <div id="clock-small" class="flip-clock-wrapper small"></div>
         </div>
 
         <div class="demo-section">
-            <div class="demo-label">Zoom Animation</div>
-            <div id="clock-zoom" class="flip-clock-wrapper medium"></div>
+            <div class="demo-label">12-Hour Format - Horizontal</div>
+            <div id="clock-12hr" class="flip-clock-wrapper medium"></div>
         </div>
 
         <div class="demo-section">
-            <div class="demo-label">Roll Animation</div>
-            <div id="clock-roll" class="flip-clock-wrapper medium"></div>
+            <div class="demo-label">Medium Size - Vertical</div>
+            <div id="clock-vertical" class="flip-clock-wrapper medium"></div>
         </div>
 
         <div class="demo-section">
-            <div class="demo-label">No Animation (Instant)</div>
-            <div id="clock-none" class="flip-clock-wrapper medium"></div>
+            <div class="demo-label">Small Size - Vertical</div>
+            <div id="clock-vertical-small" class="flip-clock-wrapper small"></div>
         </div>
     </div>
 
@@ -511,7 +535,8 @@
                     showSeconds: true,
                     showDate: true,
                     dateFormat: "dddd, MMMM D, YYYY",
-                    animationType: "flip"
+                    animationType: "flip",
+                    orientation: "horizontal"
                 }, config);
                 this.prevTime = { hours: null, minutes: null, seconds: null };
                 this.isFirstRender = true;
@@ -621,7 +646,7 @@
 
             render(time, hours, minutes, seconds) {
                 this.element.innerHTML = '';
-                this.element.className = "flip-clock-wrapper medium animation-" + this.config.animationType;
+                this.element.className = "flip-clock-wrapper medium animation-" + this.config.animationType + " orientation-" + this.config.orientation;
                 this.digitIdCounter = 0;
 
                 // Date
@@ -711,47 +736,53 @@
             }
         }
 
-        // Initialize clocks with different animation types
-        new FlipClock('clock-flip', {
+        // Initialize clocks with different sizes and orientations
+        new FlipClock('clock-large', {
             timeFormat: 24,
             showSeconds: true,
-            showDate: false,
-            animationType: "flip"
+            showDate: true,
+            animationType: "flip",
+            orientation: "horizontal"
         });
 
-        new FlipClock('clock-fade', {
+        new FlipClock('clock-medium', {
             timeFormat: 24,
             showSeconds: true,
-            showDate: false,
-            animationType: "fade"
+            showDate: true,
+            animationType: "flip",
+            orientation: "horizontal"
         });
 
-        new FlipClock('clock-slide', {
+        new FlipClock('clock-small', {
             timeFormat: 24,
             showSeconds: true,
             showDate: false,
-            animationType: "slide"
+            animationType: "flip",
+            orientation: "horizontal"
         });
 
-        new FlipClock('clock-zoom', {
-            timeFormat: 24,
+        new FlipClock('clock-12hr', {
+            timeFormat: 12,
             showSeconds: true,
             showDate: false,
-            animationType: "zoom"
+            animationType: "flip",
+            orientation: "horizontal"
         });
 
-        new FlipClock('clock-roll', {
+        new FlipClock('clock-vertical', {
             timeFormat: 24,
             showSeconds: true,
-            showDate: false,
-            animationType: "roll"
+            showDate: true,
+            animationType: "flip",
+            orientation: "vertical"
         });
 
-        new FlipClock('clock-none', {
+        new FlipClock('clock-vertical-small', {
             timeFormat: 24,
-            showSeconds: true,
+            showSeconds: false,
             showDate: false,
-            animationType: "none"
+            animationType: "flip",
+            orientation: "vertical"
         });
     </script>
 </body>

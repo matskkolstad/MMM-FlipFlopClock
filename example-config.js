@@ -14,6 +14,7 @@
         // showSeconds: true
         // showDate: true
         // size: "medium"
+        // orientation: "horizontal"
     }
 }
 
@@ -26,7 +27,8 @@
         showSeconds: true,
         showDate: true,
         dateFormat: "dddd, MMMM D",
-        size: "large"
+        size: "large",
+        orientation: "horizontal"
     }
 }
 
@@ -37,7 +39,8 @@
     config: {
         showSeconds: false,
         showDate: false,
-        size: "medium"
+        size: "medium",
+        orientation: "horizontal"
     }
 }
 
@@ -50,6 +53,33 @@
         showSeconds: false,
         showDate: true,
         dateFormat: "DD.MM.YYYY",
-        size: "small"
+        size: "small",
+        orientation: "horizontal"
+    }
+}
+
+// Example 5: Vertical orientation
+{
+    module: "MMM-FlipFlopClock",
+    position: "top_left",
+    config: {
+        timeFormat: 24,
+        showSeconds: true,
+        showDate: true,
+        size: "medium",
+        orientation: "vertical"
+    }
+}
+
+// Example 6: Vertical orientation without seconds
+{
+    module: "MMM-FlipFlopClock",
+    position: "bottom_left",
+    config: {
+        timeFormat: 12,
+        showSeconds: false,
+        showDate: false,
+        size: "small",
+        orientation: "vertical"
     }
 }

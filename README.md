@@ -2,7 +2,7 @@
 
 A beautiful, classic flip clock module for MagicMirror². This module displays the current time with an elegant flip animation, reminiscent of vintage flip clocks.
 
-![Flip Clock Preview](https://github.com/user-attachments/assets/08bdf0a7-cc01-480f-b69f-7c950d50ca10)
+![Flip Clock Preview](https://github.com/user-attachments/assets/c3263d99-6be8-4ab6-a68a-faa4510cc7a4)
 
 ## Features
 
@@ -52,6 +52,7 @@ Add the module to the modules array in your `config/config.js` file:
 | `dateFormat` | `String` | `"dddd, MMMM D, YYYY"` | Date format (using Moment.js format) |
 | `size` | `String` | `"medium"` | Size of the clock: `"small"`, `"medium"`, or `"large"` |
 | `animationType` | `String` | `"flip"` | Animation style for time transitions: `"flip"`, `"fade"`, `"slide"`, `"zoom"`, `"roll"`, or `"none"` |
+| `orientation` | `String` | `"horizontal"` | Layout orientation: `"horizontal"` or `"vertical"` |
 
 ### Example Configuration
 
@@ -120,6 +121,15 @@ Add the module to the modules array in your `config/config.js` file:
         animationType: "none"
     }
 }
+
+// Vertical orientation
+{
+    module: "MMM-FlipFlopClock",
+    position: "top_left",
+    config: {
+        orientation: "vertical"
+    }
+}
 ```
 
 ## Date Format Options
@@ -157,16 +167,43 @@ You can set the animation type in your configuration:
 }
 ```
 
+## Orientation Options
+
+The clock supports two orientation modes to fit different placements on your MagicMirror:
+
+- **`horizontal`** (default) - Traditional layout with time displayed horizontally (HH:MM:SS)
+- **`vertical`** - Stacked layout with time components displayed vertically, perfect for narrow spaces or side positions
+
+In vertical mode:
+- Time units stack vertically (hours, then minutes, then seconds if enabled)
+- Separators (colons) are hidden for a cleaner look
+- Date remains at the top (if enabled)
+- AM/PM indicator appears below the time (if using 12-hour format)
+
+Example vertical configuration:
+
+```javascript
+{
+    module: "MMM-FlipFlopClock",
+    position: "top_left",
+    config: {
+        orientation: "vertical",
+        size: "medium"
+    }
+}
+```
+
 ## Screenshots
 
 The screenshot above shows all the different configurations available:
 
 - **Large Size with Date (24-hour)** - Perfect for a main display with full date information
-- **Medium Size (Default)** - Balanced size with date display
+- **Medium Size (Default)** - Balanced size with date display  
 - **Small Size without Date** - Compact time-only display
 - **12-Hour Format with AM/PM** - Classic 12-hour format with AM/PM indicator
+- **Vertical Orientation** - Stacked layout for narrow spaces
 
-All sizes feature the classic flip clock design with smooth animations between time changes.
+All sizes and orientations feature the classic flip clock design with smooth animations between time changes.
 
 ## Styling
 
@@ -212,6 +249,12 @@ This project is licensed under the MIT License.
 - Inspired by classic flip clocks
 
 ## Changelog
+
+### Version 1.2.0 (2026-01-08)
+- Added orientation option for horizontal or vertical layout
+- Default orientation is horizontal for backward compatibility
+- Vertical mode ideal for narrow spaces and side positions
+- Updated documentation with orientation examples
 
 ### Version 1.1.0 (2026-01-08)
 - Added multiple animation types for time transitions
