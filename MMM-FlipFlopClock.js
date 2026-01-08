@@ -14,6 +14,7 @@ Module.register("MMM-FlipFlopClock", {
 		dateFormat: "dddd, MMMM D, YYYY",
 		size: "medium", // "small", "medium", "large"
 		animationType: "flip", // "flip", "fade", "slide", "none", "zoom", "roll"
+		orientation: "horizontal", // "horizontal", "vertical"
 	},
 
 	// Required scripts
@@ -45,7 +46,7 @@ Module.register("MMM-FlipFlopClock", {
 	// Override dom generator
 	getDom: function() {
 		const wrapper = document.createElement("div");
-		wrapper.className = "flip-clock-wrapper " + this.config.size + " animation-" + this.config.animationType;
+		wrapper.className = "flip-clock-wrapper " + this.config.size + " animation-" + this.config.animationType + " orientation-" + this.config.orientation;
 
 		// Create date display if enabled
 		if (this.config.showDate && this.date) {
