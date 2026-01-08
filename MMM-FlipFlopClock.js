@@ -237,43 +237,66 @@ Module.register("MMM-FlipFlopClock", {
 		if (digit && digit.dataset.value !== newValue) {
 			const oldValue = digit.dataset.value;
 			const animationType = this.config.animationType;
-			
-			// Update flip animation elements: top shows OLD value, bottom shows NEW value
+
+			const top = digit.querySelector(".flip-digit-top span");
+			const bottom = digit.querySelector(".flip-digit-bottom span");
 			const flipTop = digit.querySelector(".flip-digit-flip-top span");
 			const flipBottom = digit.querySelector(".flip-digit-flip-bottom span");
-			
-			if (flipTop) flipTop.textContent = oldValue;
-			if (flipBottom) flipBottom.textContent = newValue;
-			
+
+			// Default to classic flip behavior
+			if (animationType === "flip") {
+				// Static halves start on OLD value; overlays show NEW value immediately so the new digit is visible during the flip
+				if (top) top.textContent = oldValue;
+				if (bottom) bottom.textContent = oldValue;
+
+				// New value travels on both flip faces for a forward-facing flip
+				if (flipTop) flipTop.textContent = newValue;
+				if (flipBottom) flipBottom.textContent = newValue;
+			} else {
+				// Non-flip animations: simply set new value on static halves
+				if (top) top.textContent = newValue;
+				if (bottom) bottom.textContent = newValue;
+				if (flipTop) flipTop.textContent = newValue;
+				if (flipBottom) flipBottom.textContent = newValue;
+			}
+
 			// Add appropriate animation class based on animationType
-			const animationClass = animationType === "flip" ? "flipping" : 
+			const animationClass = animationType === "flip" ? "flipping" :
 			                       animationType === "fade" ? "fading" :
 			                       animationType === "slide" ? "sliding" :
 			                       animationType === "zoom" ? "zooming" :
 			                       animationType === "roll" ? "rolling" : "changing";
-			
+
+			// Reset any previous animation classes before re-triggering
+			digit.classList.remove("flipping", "fading", "sliding", "zooming", "rolling", "changing");
+			// Force reflow so the class re-application reliably restarts the animation
+			void digit.offsetWidth;
+
 			digit.classList.add(animationClass);
-			
-			// Determine animation duration based on type
+
+			// Determine animation duration based on type (ms)
 			const animationDuration = animationType === "none" ? 0 :
 			                          animationType === "fade" ? 400 :
 			                          animationType === "slide" ? 400 :
 			                          animationType === "zoom" ? 400 :
 			                          animationType === "roll" ? 600 :
 			                          600; // flip default
-			
-			// Update both static elements after animation completes
+
+			// For the flip animation, swap the top half to the new value halfway through
+			if (animationType === "flip") {
+				setTimeout(function() {
+					if (top) top.textContent = newValue;
+				}, 300); // matches flipTop 0.3s duration
+			}
+
+			// Finalize after animation completes
 			setTimeout(function() {
 				digit.classList.remove(animationClass);
-				
-				// Update static top with new value
-				const top = digit.querySelector(".flip-digit-top span");
+
+				// Ensure both static halves end on the new value
 				if (top) top.textContent = newValue;
-				
-				// Update static bottom with new value
-				const bottom = digit.querySelector(".flip-digit-bottom span");
 				if (bottom) bottom.textContent = newValue;
-				
+
 				// Update data attribute
 				digit.dataset.value = newValue;
 			}, animationDuration);

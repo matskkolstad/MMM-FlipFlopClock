@@ -36,6 +36,7 @@
 	width: 60px;
 	height: 90px;
 	perspective: 1000px;
+	transform-style: preserve-3d;
 	border-radius: 6px;
 	overflow: hidden;
 	box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
@@ -53,6 +54,8 @@
 	align-items: center;
 	justify-content: center;
 	box-sizing: border-box;
+	backface-visibility: hidden;
+	transform-style: preserve-3d;
 }
 
 .flip-digit-top {
@@ -89,7 +92,7 @@
 
 /* Flip animation elements */
 .flip-digit-flip {
-	z-index: 2;
+	z-index: 3;
 	opacity: 0;
 	pointer-events: none;
 }
@@ -128,6 +131,7 @@
 }
 
 /* Flipping animation */
+
 .flip-digit.flipping .flip-digit-flip-top {
 	opacity: 1;
 	animation: flipTop 0.3s ease-in;
