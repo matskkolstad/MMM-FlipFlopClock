@@ -13,6 +13,7 @@ Module.register("MMM-FlipFlopClock", {
 		showDate: true,
 		dateFormat: "dddd, MMMM D, YYYY",
 		size: "medium", // "small", "medium", "large"
+		animationType: "flip", // "flip", "fade", "slide", "none", "zoom", "roll"
 	},
 
 	// Required scripts
@@ -44,7 +45,7 @@ Module.register("MMM-FlipFlopClock", {
 	// Override dom generator
 	getDom: function() {
 		const wrapper = document.createElement("div");
-		wrapper.className = "flip-clock-wrapper " + this.config.size;
+		wrapper.className = "flip-clock-wrapper " + this.config.size + " animation-" + this.config.animationType;
 
 		// Create date display if enabled
 		if (this.config.showDate && this.date) {
@@ -235,6 +236,7 @@ Module.register("MMM-FlipFlopClock", {
 		
 		if (digit && digit.dataset.value !== newValue) {
 			const oldValue = digit.dataset.value;
+			const animationType = this.config.animationType;
 			
 			// Update flip animation elements: top shows OLD value, bottom shows NEW value
 			const flipTop = digit.querySelector(".flip-digit-flip-top span");
@@ -243,13 +245,26 @@ Module.register("MMM-FlipFlopClock", {
 			if (flipTop) flipTop.textContent = oldValue;
 			if (flipBottom) flipBottom.textContent = newValue;
 			
-			// Add flip animation class to start the animation
-			digit.classList.add("flipping");
+			// Add appropriate animation class based on animationType
+			const animationClass = animationType === "flip" ? "flipping" : 
+			                       animationType === "fade" ? "fading" :
+			                       animationType === "slide" ? "sliding" :
+			                       animationType === "zoom" ? "zooming" :
+			                       animationType === "roll" ? "rolling" : "changing";
+			
+			digit.classList.add(animationClass);
+			
+			// Determine animation duration based on type
+			const animationDuration = animationType === "none" ? 0 :
+			                          animationType === "fade" ? 400 :
+			                          animationType === "slide" ? 400 :
+			                          animationType === "zoom" ? 400 :
+			                          animationType === "roll" ? 600 :
+			                          600; // flip default
 			
 			// Update both static elements after animation completes
-			// Duration: 600ms (matches CSS: flipTop 300ms + flipBottom 300ms with 300ms delay)
 			setTimeout(function() {
-				digit.classList.remove("flipping");
+				digit.classList.remove(animationClass);
 				
 				// Update static top with new value
 				const top = digit.querySelector(".flip-digit-top span");
@@ -261,7 +276,7 @@ Module.register("MMM-FlipFlopClock", {
 				
 				// Update data attribute
 				digit.dataset.value = newValue;
-			}, 600);
+			}, animationDuration);
 		}
 	}
 });

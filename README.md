@@ -12,7 +12,7 @@ A beautiful, classic flip clock module for MagicMirror². This module displays t
 - ⚙️ Optional seconds display
 - 📅 Optional date display
 - 📱 Responsive design
-- 🎭 Beautiful flip animations
+- 🎭 Multiple animation styles: flip, fade, slide, zoom, roll, or none
 
 ## Installation
 
@@ -51,6 +51,7 @@ Add the module to the modules array in your `config/config.js` file:
 | `showDate` | `Boolean` | `true` | Display date above the clock |
 | `dateFormat` | `String` | `"dddd, MMMM D, YYYY"` | Date format (using Moment.js format) |
 | `size` | `String` | `"medium"` | Size of the clock: `"small"`, `"medium"`, or `"large"` |
+| `animationType` | `String` | `"flip"` | Animation style for time transitions: `"flip"`, `"fade"`, `"slide"`, `"zoom"`, `"roll"`, or `"none"` |
 
 ### Example Configuration
 
@@ -72,7 +73,8 @@ Add the module to the modules array in your `config/config.js` file:
         showSeconds: true,
         showDate: true,
         dateFormat: "dddd, MMMM D",
-        size: "large"
+        size: "large",
+        animationType: "fade"
     }
 }
 ```
@@ -90,6 +92,36 @@ Add the module to the modules array in your `config/config.js` file:
 }
 ```
 
+#### With Different Animations
+```javascript
+// Smooth fade animation
+{
+    module: "MMM-FlipFlopClock",
+    position: "top_center",
+    config: {
+        animationType: "fade"
+    }
+}
+
+// Slide animation
+{
+    module: "MMM-FlipFlopClock",
+    position: "top_center",
+    config: {
+        animationType: "slide"
+    }
+}
+
+// No animation (instant change)
+{
+    module: "MMM-FlipFlopClock",
+    position: "top_center",
+    config: {
+        animationType: "none"
+    }
+}
+```
+
 ## Date Format Options
 
 The `dateFormat` option uses Moment.js formatting. Here are some common examples:
@@ -101,6 +133,29 @@ The `dateFormat` option uses Moment.js formatting. Here are some common examples
 - `"DD.MM.YYYY"` → 07.01.2026
 
 See the [Moment.js documentation](https://momentjs.com/docs/#/displaying/format/) for more format options.
+
+## Animation Types
+
+The module supports several animation styles for time transitions:
+
+- **`flip`** (default) - Classic flip clock animation with 3D rotation effect, reminiscent of vintage flip clocks
+- **`fade`** - Smooth fade transition where digits fade out and fade in with the new value
+- **`slide`** - Digits slide down and fade out, creating a smooth downward motion
+- **`zoom`** - Digits zoom out and zoom back in with the new value
+- **`roll`** - Digits roll horizontally with a 3D rotation effect
+- **`none`** - Instant change with no animation for minimal visual distraction
+
+You can set the animation type in your configuration:
+
+```javascript
+{
+    module: "MMM-FlipFlopClock",
+    position: "top_center",
+    config: {
+        animationType: "fade" // Choose your preferred animation
+    }
+}
+```
 
 ## Screenshots
 
@@ -115,12 +170,14 @@ All sizes feature the classic flip clock design with smooth animations between t
 
 ## Styling
 
-The module uses CSS variables and can be further customized by editing the `MMM-FlipFlopClock.css` file. The flip animation creates a realistic card-flipping effect with:
+The module uses CSS variables and can be further customized by editing the `MMM-FlipFlopClock.css` file. The animations create smooth transitions between time changes:
 
-- Smooth 3D rotation animations
-- Subtle shadow effects
-- Gradient backgrounds for depth
-- Shine effect during flips
+- **Flip**: Realistic card-flipping effect with 3D rotation, subtle shadow effects, gradient backgrounds, and shine effect
+- **Fade**: Simple opacity transition for a subtle effect
+- **Slide**: Downward sliding motion with fade
+- **Zoom**: Scale transformation for a dynamic effect
+- **Roll**: Horizontal 3D rotation for a unique look
+- **None**: Instant update for minimal distraction
 
 ## Technical Details
 
@@ -155,6 +212,12 @@ This project is licensed under the MIT License.
 - Inspired by classic flip clocks
 
 ## Changelog
+
+### Version 1.1.0 (2026-01-08)
+- Added multiple animation types for time transitions
+- New animation options: fade, slide, zoom, roll, and none
+- Flip animation remains the default
+- Updated documentation with animation examples
 
 ### Version 1.0.0 (2026-01-07)
 - Initial release
