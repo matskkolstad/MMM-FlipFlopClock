@@ -159,6 +159,8 @@ Module.register("MMM-FlipFlopClock", {
 
 	// Fetch current time and animate changed digits
 	updateTime: function() {
+		// Use moment-timezone when available; falls back to local time if the
+		// library is not loaded or the timezone string is not set.
 		if (this.config.timezone && moment.tz) {
 			this.time = moment().tz(this.config.timezone);
 		} else {

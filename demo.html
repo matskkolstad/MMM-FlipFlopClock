@@ -204,32 +204,32 @@
                         'July','August','September','October','November','December'];
         const SHORT_MONTHS = ['Jan','Feb','Mar','Apr','May','Jun',
                               'Jul','Aug','Sep','Oct','Nov','Dec'];
-        function pad(n) { return n < 10 ? '0'+n : ''+n; }
-        function fmt(d, f) {
-            const h24  = d.getHours(), h12mod = h24 % 12, h12 = h12mod === 0 ? 12 : h12mod;
+        function pad(num) { return num < 10 ? '0'+num : ''+num; }
+        function fmt(date, format) {
+            const h24  = date.getHours(), h12mod = h24 % 12, h12 = h12mod === 0 ? 12 : h12mod;
             const map = {
                 HH: pad(h24),
                 hh: pad(h12),
-                mm: pad(d.getMinutes()),
-                ss: pad(d.getSeconds()),
+                mm: pad(date.getMinutes()),
+                ss: pad(date.getSeconds()),
                 A:  h24 >= 12 ? 'PM' : 'AM',
                 a:  h24 >= 12 ? 'pm' : 'am',
-                dddd: DAYS[d.getDay()],
-                ddd:  DAYS[d.getDay()].slice(0,3),
-                MMMM: MONTHS[d.getMonth()],
-                MMM:  SHORT_MONTHS[d.getMonth()],
-                MM:   pad(d.getMonth()+1),
-                M:    ''+(d.getMonth()+1),
-                DD:   pad(d.getDate()),
-                D:    ''+d.getDate(),
-                YYYY: ''+d.getFullYear(),
-                YY:   (''+d.getFullYear()).slice(-2),
+                dddd: DAYS[date.getDay()],
+                ddd:  DAYS[date.getDay()].slice(0,3),
+                MMMM: MONTHS[date.getMonth()],
+                MMM:  SHORT_MONTHS[date.getMonth()],
+                MM:   pad(date.getMonth()+1),
+                M:    ''+(date.getMonth()+1),
+                DD:   pad(date.getDate()),
+                D:    ''+date.getDate(),
+                YYYY: ''+date.getFullYear(),
+                YY:   (''+date.getFullYear()).slice(-2),
             };
-            return f.replace(/dddd|ddd|MMMM|MMM|MM|M|DD|D|YYYY|YY|HH|hh|mm|ss|A|a/g, m => map[m] || m);
+            return format.replace(/dddd|ddd|MMMM|MMM|MM|M|DD|D|YYYY|YY|HH|hh|mm|ss|A|a/g, match => map[match] || match);
         }
         return function() {
             const d = new Date();
-            return { format: f => fmt(d, f) };
+            return { format: fmt_str => fmt(d, fmt_str) };
         };
     })();
 
