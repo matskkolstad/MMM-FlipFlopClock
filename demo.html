@@ -4,786 +4,526 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MMM-FlipFlopClock Demo</title>
-    <!-- Moment.js alternative: use built-in Date API -->
-    <script>
-        // Simple date formatting helper
-        const formatDate = {
-            format: function(date, format) {
-                const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-                const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-                
-                const day = days[date.getDay()];
-                const month = months[date.getMonth()];
-                const dateNum = date.getDate();
-                const year = date.getFullYear();
-                
-                if (format === "dddd, MMMM D, YYYY") {
-                    return `${day}, ${month} ${dateNum}, ${year}`;
-                } else if (format === "MMMM D, YYYY") {
-                    return `${month} ${dateNum}, ${year}`;
-                } else if (format === "dddd, MMMM D") {
-                    return `${day}, ${month} ${dateNum}`;
-                }
-                return `${day}, ${month} ${dateNum}, ${year}`;
-            },
-            pad: function(num) {
-                return num < 10 ? '0' + num : num.toString();
-            }
-        };
-
-        const moment = function() {
-            const date = new Date();
-            return {
-                format: function(fmt) {
-                    if (fmt === "HH") return formatDate.pad(date.getHours());
-                    if (fmt === "hh") {
-                        let h = date.getHours() % 12;
-                        if (h === 0) h = 12;
-                        return formatDate.pad(h);
-                    }
-                    if (fmt === "mm") return formatDate.pad(date.getMinutes());
-                    if (fmt === "ss") return formatDate.pad(date.getSeconds());
-                    if (fmt === "A") return date.getHours() >= 12 ? "PM" : "AM";
-                    return formatDate.format(date, fmt);
-                }
-            };
-        };
-    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <!-- Inline the module CSS so we can demo without a server -->
+    <link rel="stylesheet" href="MMM-FlipFlopClock.css">
     <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
         body {
-            margin: 0;
-            padding: 40px;
-            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            background: linear-gradient(135deg, #0d1b2a 0%, #1b2a3b 100%);
             min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            font-family: 'Roboto', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            padding: 40px 20px 60px;
+            font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+            color: #e0e0e0;
         }
 
         h1 {
-            color: white;
-            margin-bottom: 20px;
             text-align: center;
+            font-size: 2rem;
             font-weight: 300;
-            letter-spacing: 3px;
-        }
-
-        .demo-container {
-            display: flex;
-            flex-direction: column;
-            gap: 60px;
-            align-items: center;
-        }
-
-        .demo-section {
-            background: rgba(0, 0, 0, 0.3);
-            padding: 30px;
-            border-radius: 15px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-        }
-
-        .demo-label {
-            color: white;
-            text-align: center;
-            margin-bottom: 15px;
-            font-size: 18px;
-            font-weight: 300;
-            opacity: 0.8;
-        }
-
-        /* Import the flip clock styles */
-        .flip-clock-wrapper {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            font-family: 'Roboto', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            margin-bottom: 6px;
             color: #fff;
         }
 
-        .flip-date {
-            font-size: 24px;
-            margin-bottom: 20px;
+        .subtitle {
             text-align: center;
-            font-weight: 300;
+            font-size: 0.85rem;
+            letter-spacing: 1px;
+            opacity: 0.5;
+            margin-bottom: 40px;
+        }
+
+        /* ── Controls panel ── */
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            justify-content: center;
+            margin-bottom: 50px;
+        }
+
+        .control-group {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 10px;
+            padding: 14px 20px;
+        }
+
+        .control-group label {
+            display: block;
+            font-size: 0.72rem;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            opacity: 0.55;
+            margin-bottom: 10px;
+        }
+
+        .btn-row {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            padding: 6px 14px;
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 20px;
+            background: transparent;
+            color: #ccc;
+            font-size: 0.82rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        button:hover  { background: rgba(255,255,255,0.1); color: #fff; }
+        button.active { background: rgba(255,255,255,0.22); color: #fff; border-color: rgba(255,255,255,0.5); }
+
+        /* ── Demo grid ── */
+        .demo-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 40px;
+            justify-content: center;
+        }
+
+        .demo-card {
+            background: rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.07);
+            border-radius: 16px;
+            padding: 30px 36px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 18px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+        }
+
+        .demo-card-label {
+            font-size: 0.78rem;
             letter-spacing: 2px;
             text-transform: uppercase;
-            opacity: 0.8;
+            opacity: 0.45;
         }
 
-        .flip-time-container {
+        /* ── Live clock ── */
+        #main-clock-wrapper {
             display: flex;
-            align-items: center;
             justify-content: center;
-            gap: 10px;
-        }
-
-        .flip-digit-pair {
-            display: flex;
-            gap: 5px;
-        }
-
-        .flip-digit {
-            position: relative;
-            display: inline-block;
-            width: 60px;
-            height: 90px;
-            perspective: 1000px;
-            border-radius: 6px;
-            overflow: hidden;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
-        }
-
-        .flip-digit-top,
-        .flip-digit-bottom,
-        .flip-digit-flip {
-            position: absolute;
-            width: 100%;
-            height: 50%;
-            overflow: hidden;
-            background: linear-gradient(to bottom, #3a3a3a 0%, #2a2a2a 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-sizing: border-box;
-        }
-
-        .flip-digit-top {
-            top: 0;
-            border-bottom: 1px solid #000;
-            border-radius: 6px 6px 0 0;
-        }
-
-        .flip-digit-bottom {
-            bottom: 0;
-            border-top: 1px solid #000;
-            border-radius: 0 0 6px 6px;
-        }
-
-        .flip-digit-top span,
-        .flip-digit-bottom span {
-            position: absolute;
-            width: 100%;
-            font-size: 56px;
-            font-weight: bold;
-            line-height: 90px;
-            color: #fff;
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
-            left: 0;
-        }
-
-        .flip-digit-top span {
-            top: 0;
-        }
-
-        .flip-digit-bottom span {
-            top: -45px;
-        }
-
-        .flip-digit-flip {
-            z-index: 2;
-            opacity: 0;
-            pointer-events: none;
-        }
-
-        .flip-digit-flip-top {
-            top: 0;
-            transform-origin: bottom;
-            border-radius: 6px 6px 0 0;
-            border-bottom: 1px solid #000;
-        }
-
-        .flip-digit-flip-bottom {
-            bottom: 0;
-            transform-origin: top;
-            border-radius: 0 0 6px 6px;
-            border-top: 1px solid #000;
-        }
-
-        .flip-digit-flip span {
-            position: absolute;
-            width: 100%;
-            font-size: 56px;
-            font-weight: bold;
-            line-height: 90px;
-            color: #fff;
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
-            left: 0;
-        }
-
-        .flip-digit-flip-top span {
-            top: 0;
-        }
-
-        .flip-digit-flip-bottom span {
-            top: -45px;
-        }
-
-        .flip-digit.flipping .flip-digit-flip-top {
-            opacity: 1;
-            animation: flipTop 0.3s ease-in;
-        }
-
-        .flip-digit.flipping .flip-digit-flip-bottom {
-            opacity: 1;
-            animation: flipBottom 0.3s ease-out 0.3s;
-        }
-
-        @keyframes flipTop {
-            0% { transform: rotateX(0deg); }
-            100% { transform: rotateX(-90deg); }
-        }
-
-        @keyframes flipBottom {
-            0% { transform: rotateX(90deg); }
-            100% { transform: rotateX(0deg); }
-        }
-
-        .flip-separator {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            margin: 0 10px;
-            height: 90px;
-        }
-
-        .flip-separator span {
-            font-size: 48px;
-            font-weight: bold;
-            color: #fff;
-            line-height: 0.6;
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
-        }
-
-        .flip-ampm {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            margin-left: 15px;
-            font-size: 24px;
-            font-weight: 300;
-            color: #fff;
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
-        }
-
-        /* Size variants */
-        .flip-clock-wrapper.small .flip-digit {
-            width: 40px;
-            height: 60px;
-        }
-
-        .flip-clock-wrapper.small .flip-digit-top span,
-        .flip-clock-wrapper.small .flip-digit-bottom span,
-        .flip-clock-wrapper.small .flip-digit-flip span {
-            font-size: 36px;
-            line-height: 60px;
-        }
-
-        .flip-clock-wrapper.small .flip-digit-bottom span,
-        .flip-clock-wrapper.small .flip-digit-flip-bottom span {
-            top: -30px;
-        }
-
-        .flip-clock-wrapper.small .flip-separator span {
-            font-size: 32px;
-        }
-
-        .flip-clock-wrapper.small .flip-date {
-            font-size: 18px;
-            margin-bottom: 15px;
-        }
-
-        .flip-clock-wrapper.small .flip-ampm {
-            font-size: 18px;
-        }
-
-        .flip-clock-wrapper.large .flip-digit {
-            width: 80px;
-            height: 120px;
-        }
-
-        .flip-clock-wrapper.large .flip-digit-top span,
-        .flip-clock-wrapper.large .flip-digit-bottom span,
-        .flip-clock-wrapper.large .flip-digit-flip span {
-            font-size: 76px;
-            line-height: 120px;
-        }
-
-        .flip-clock-wrapper.large .flip-digit-bottom span,
-        .flip-clock-wrapper.large .flip-digit-flip-bottom span {
-            top: -60px;
-        }
-
-        .flip-clock-wrapper.large .flip-separator span {
-            font-size: 64px;
-        }
-
-        .flip-clock-wrapper.large .flip-date {
-            font-size: 32px;
-            margin-bottom: 25px;
-        }
-
-        .flip-clock-wrapper.large .flip-ampm {
-            font-size: 32px;
-        }
-
-        .flip-digit::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(to bottom, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0) 50%, rgba(0, 0, 0, 0.2) 50%, rgba(0, 0, 0, 0.1) 100%);
-            pointer-events: none;
-            border-radius: 6px;
-        }
-
-        .flip-digit.flipping::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-            animation: shine 0.6s ease-in-out;
-            pointer-events: none;
-        }
-
-        @keyframes shine {
-            0% { left: -100%; }
-            100% { left: 100%; }
-        }
-
-        /* None animation (instant change) */
-        .animation-none .flip-digit.changing .flip-digit-top,
-        .animation-none .flip-digit.changing .flip-digit-bottom {
-            transition: none;
-        }
-
-        /* Fade animation */
-        .flip-digit.fading .flip-digit-top,
-        .flip-digit.fading .flip-digit-bottom {
-            animation: fadeOut 0.2s ease-in forwards, fadeIn 0.2s ease-out 0.2s forwards;
-        }
-
-        @keyframes fadeOut {
-            0% { opacity: 1; }
-            100% { opacity: 0; }
-        }
-
-        @keyframes fadeIn {
-            0% { opacity: 0; }
-            100% { opacity: 1; }
-        }
-
-        /* Slide animation */
-        .flip-digit.sliding {
-            overflow: hidden;
-        }
-
-        .flip-digit.sliding .flip-digit-top,
-        .flip-digit.sliding .flip-digit-bottom {
-            animation: slideOut 0.4s ease-in-out forwards;
-        }
-
-        @keyframes slideOut {
-            0% {
-                transform: translateY(0);
-                opacity: 1;
-            }
-            50% {
-                opacity: 0;
-            }
-            100% {
-                transform: translateY(20px);
-                opacity: 0;
-            }
-        }
-
-        /* Zoom animation */
-        .flip-digit.zooming .flip-digit-top,
-        .flip-digit.zooming .flip-digit-bottom {
-            animation: zoomOut 0.2s ease-in forwards, zoomIn 0.2s ease-out 0.2s forwards;
-        }
-
-        @keyframes zoomOut {
-            0% {
-                transform: scale(1);
-                opacity: 1;
-            }
-            100% {
-                transform: scale(0.5);
-                opacity: 0;
-            }
-        }
-
-        @keyframes zoomIn {
-            0% {
-                transform: scale(1.5);
-                opacity: 0;
-            }
-            100% {
-                transform: scale(1);
-                opacity: 1;
-            }
-        }
-
-        /* Roll animation */
-        .flip-digit.rolling {
-            perspective: 1000px;
-        }
-
-        .flip-digit.rolling .flip-digit-top,
-        .flip-digit.rolling .flip-digit-bottom {
-            animation: rollOut 0.3s ease-in forwards, rollIn 0.3s ease-out 0.3s forwards;
-        }
-
-        @keyframes rollOut {
-            0% {
-                transform: rotateY(0deg);
-                opacity: 1;
-            }
-            100% {
-                transform: rotateY(90deg);
-                opacity: 0;
-            }
-        }
-
-        @keyframes rollIn {
-            0% {
-                transform: rotateY(-90deg);
-                opacity: 0;
-            }
-            100% {
-                transform: rotateY(0deg);
-                opacity: 1;
-            }
-        }
-
-        /* Vertical orientation */
-        .flip-clock-wrapper.orientation-vertical {
-            flex-direction: column;
-            align-items: center;
-        }
-
-        .flip-clock-wrapper.orientation-vertical .flip-time-container {
-            flex-direction: column;
-            gap: 15px;
-        }
-
-        .flip-clock-wrapper.orientation-vertical .flip-separator {
-            display: none;
-        }
-
-        .flip-clock-wrapper.orientation-vertical .flip-digit-pair {
-            justify-content: center;
-        }
-
-        .flip-clock-wrapper.orientation-vertical .flip-ampm {
-            margin-left: 0;
-            margin-top: 15px;
+            margin-bottom: 50px;
         }
     </style>
 </head>
 <body>
-    <h1>MMM-FlipFlopClock Demo</h1>
-    
-    <div class="demo-container">
-        <div class="demo-section">
-            <div class="demo-label">Large Size - Horizontal (Default)</div>
-            <div id="clock-large" class="flip-clock-wrapper large"></div>
+    <h1>MMM-FlipFlopClock</h1>
+    <p class="subtitle">Interactive Demo — MagicMirror² Module</p>
+
+    <!-- ── Controls ── -->
+    <div class="controls">
+        <div class="control-group">
+            <label>Animation</label>
+            <div class="btn-row" id="anim-btns">
+                <button class="active" data-anim="flip">Flip</button>
+                <button data-anim="fade">Fade</button>
+                <button data-anim="slide">Slide</button>
+                <button data-anim="zoom">Zoom</button>
+                <button data-anim="roll">Roll</button>
+                <button data-anim="none">None</button>
+            </div>
         </div>
 
-        <div class="demo-section">
-            <div class="demo-label">Medium Size - Horizontal with Date</div>
-            <div id="clock-medium" class="flip-clock-wrapper medium"></div>
+        <div class="control-group">
+            <label>Theme</label>
+            <div class="btn-row" id="theme-btns">
+                <button class="active" data-theme="dark">Dark</button>
+                <button data-theme="light">Light</button>
+                <button data-theme="amber">Amber</button>
+                <button data-theme="green">Green</button>
+                <button data-theme="blue">Blue</button>
+            </div>
         </div>
 
-        <div class="demo-section">
-            <div class="demo-label">Small Size - Horizontal</div>
-            <div id="clock-small" class="flip-clock-wrapper small"></div>
+        <div class="control-group">
+            <label>Size</label>
+            <div class="btn-row" id="size-btns">
+                <button data-size="small">Small</button>
+                <button class="active" data-size="medium">Medium</button>
+                <button data-size="large">Large</button>
+                <button data-size="xlarge">XLarge</button>
+            </div>
         </div>
 
-        <div class="demo-section">
-            <div class="demo-label">12-Hour Format - Horizontal</div>
-            <div id="clock-12hr" class="flip-clock-wrapper medium"></div>
+        <div class="control-group">
+            <label>Options</label>
+            <div class="btn-row">
+                <button id="toggle-seconds" class="active">Seconds ✓</button>
+                <button id="toggle-date"    class="active">Date ✓</button>
+                <button id="toggle-blink"               >Blink ✗</button>
+                <button id="toggle-12hr"                >12-hr ✗</button>
+                <button id="toggle-vertical"            >Vertical ✗</button>
+            </div>
         </div>
+    </div>
 
-        <div class="demo-section">
-            <div class="demo-label">Medium Size - Vertical</div>
-            <div id="clock-vertical" class="flip-clock-wrapper medium"></div>
+    <!-- ── Main live clock ── -->
+    <div id="main-clock-wrapper">
+        <div id="main-clock" class="flip-clock-wrapper medium theme-dark animation-flip orientation-horizontal"></div>
+    </div>
+
+    <!-- ── Static showcase: all themes ── -->
+    <div class="demo-grid" id="theme-showcase">
+        <div class="demo-card">
+            <div class="demo-card-label">Dark (default)</div>
+            <div id="sc-dark"  class="flip-clock-wrapper medium theme-dark  animation-flip orientation-horizontal"></div>
         </div>
-
-        <div class="demo-section">
-            <div class="demo-label">Small Size - Vertical</div>
-            <div id="clock-vertical-small" class="flip-clock-wrapper small"></div>
+        <div class="demo-card">
+            <div class="demo-card-label">Light</div>
+            <div id="sc-light" class="flip-clock-wrapper medium theme-light animation-flip orientation-horizontal"></div>
+        </div>
+        <div class="demo-card">
+            <div class="demo-card-label">Amber</div>
+            <div id="sc-amber" class="flip-clock-wrapper medium theme-amber animation-flip orientation-horizontal"></div>
+        </div>
+        <div class="demo-card">
+            <div class="demo-card-label">Green</div>
+            <div id="sc-green" class="flip-clock-wrapper medium theme-green animation-flip orientation-horizontal"></div>
+        </div>
+        <div class="demo-card">
+            <div class="demo-card-label">Blue</div>
+            <div id="sc-blue"  class="flip-clock-wrapper medium theme-blue  animation-flip orientation-horizontal"></div>
         </div>
     </div>
 
     <script>
-        class FlipClock {
-            constructor(elementId, config) {
-                this.element = document.getElementById(elementId);
-                this.elementId = elementId;
-                this.config = Object.assign({
-                    timeFormat: 24,
-                    showSeconds: true,
-                    showDate: true,
-                    dateFormat: "dddd, MMMM D, YYYY",
-                    animationType: "flip",
-                    orientation: "horizontal"
-                }, config);
-                this.prevTime = { hours: null, minutes: null, seconds: null };
-                this.isFirstRender = true;
-                this.digitIdCounter = 0;
-                this.init();
-            }
+    // ── Minimal moment.js shim ──────────────────────────────────────────────
+    const moment = (function() {
+        const DAYS   = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+        const MONTHS = ['January','February','March','April','May','June',
+                        'July','August','September','October','November','December'];
+        const SHORT_MONTHS = ['Jan','Feb','Mar','Apr','May','Jun',
+                              'Jul','Aug','Sep','Oct','Nov','Dec'];
+        function pad(n) { return n < 10 ? '0'+n : ''+n; }
+        function fmt(d, f) {
+            const h24  = d.getHours(), h12mod = h24 % 12, h12 = h12mod === 0 ? 12 : h12mod;
+            const map = {
+                HH: pad(h24),
+                hh: pad(h12),
+                mm: pad(d.getMinutes()),
+                ss: pad(d.getSeconds()),
+                A:  h24 >= 12 ? 'PM' : 'AM',
+                a:  h24 >= 12 ? 'pm' : 'am',
+                dddd: DAYS[d.getDay()],
+                ddd:  DAYS[d.getDay()].slice(0,3),
+                MMMM: MONTHS[d.getMonth()],
+                MMM:  SHORT_MONTHS[d.getMonth()],
+                MM:   pad(d.getMonth()+1),
+                M:    ''+(d.getMonth()+1),
+                DD:   pad(d.getDate()),
+                D:    ''+d.getDate(),
+                YYYY: ''+d.getFullYear(),
+                YY:   (''+d.getFullYear()).slice(-2),
+            };
+            return f.replace(/dddd|ddd|MMMM|MMM|MM|M|DD|D|YYYY|YY|HH|hh|mm|ss|A|a/g, m => map[m] || m);
+        }
+        return function() {
+            const d = new Date();
+            return { format: f => fmt(d, f) };
+        };
+    })();
 
-            init() {
-                this.update();
-                setInterval(() => this.update(), 1000);
-            }
-
-            update() {
-                const time = moment();
-                const hours = this.config.timeFormat === 12 ? time.format("hh") : time.format("HH");
-                const minutes = time.format("mm");
-                const seconds = time.format("ss");
-
-                // On first render, build the DOM
-                if (this.isFirstRender) {
-                    this.render(time, hours, minutes, seconds);
-                    this.prevTime = { hours, minutes, seconds };
-                    this.isFirstRender = false;
-                    return;
-                }
-
-                // Check if update needed and animate
-                if (hours !== this.prevTime.hours) {
-                    this.flipDigitPair(hours, "hours");
-                }
-                if (minutes !== this.prevTime.minutes) {
-                    this.flipDigitPair(minutes, "minutes");
-                }
-                if (this.config.showSeconds && seconds !== this.prevTime.seconds) {
-                    this.flipDigitPair(seconds, "seconds");
-                }
-
-                // Update AM/PM
-                if (this.config.timeFormat === 12) {
-                    const ampmElement = this.element.querySelector(".flip-ampm");
-                    if (ampmElement) {
-                        ampmElement.textContent = time.format("A");
-                    }
-                }
-
-                this.prevTime = { hours, minutes, seconds };
-            }
-
-            flipDigitPair(newValue, unit) {
-                const digit1 = newValue.toString().charAt(0);
-                const digit2 = newValue.toString().charAt(1);
-                
-                this.flipSingleDigit(digit1, unit + "-1");
-                this.flipSingleDigit(digit2, unit + "-2");
-            }
-
-            flipSingleDigit(newValue, id) {
-                const digitId = this.elementId + "-" + id;
-                const digit = document.getElementById(digitId);
-                
-                if (digit && digit.dataset.value !== newValue) {
-                    const oldValue = digit.dataset.value;
-                    const animationType = this.config.animationType;
-                    
-                    // Update flip animation elements: top shows OLD value, bottom shows NEW value
-                    const flipTop = digit.querySelector(".flip-digit-flip-top span");
-                    const flipBottom = digit.querySelector(".flip-digit-flip-bottom span");
-                    
-                    if (flipTop) flipTop.textContent = oldValue;
-                    if (flipBottom) flipBottom.textContent = newValue;
-                    
-                    // Add appropriate animation class based on animationType
-                    const animationClass = animationType === "flip" ? "flipping" : 
-                                           animationType === "fade" ? "fading" :
-                                           animationType === "slide" ? "sliding" :
-                                           animationType === "zoom" ? "zooming" :
-                                           animationType === "roll" ? "rolling" : "changing";
-                    
-                    digit.classList.add(animationClass);
-                    
-                    // Determine animation duration based on type
-                    const animationDuration = animationType === "none" ? 0 :
-                                              animationType === "fade" ? 400 :
-                                              animationType === "slide" ? 400 :
-                                              animationType === "zoom" ? 400 :
-                                              animationType === "roll" ? 600 :
-                                              600; // flip default
-                    
-                    // Update both static elements after animation completes
-                    // Duration: 600ms (matches CSS: flipTop 300ms + flipBottom 300ms with 300ms delay)
-                    setTimeout(function() {
-                        digit.classList.remove(animationClass);
-                        
-                        // Update static top with new value
-                        const top = digit.querySelector(".flip-digit-top span");
-                        if (top) top.textContent = newValue;
-                        
-                        // Update static bottom with new value
-                        const bottom = digit.querySelector(".flip-digit-bottom span");
-                        if (bottom) bottom.textContent = newValue;
-                        
-                        // Update data attribute
-                        digit.dataset.value = newValue;
-                    }, animationDuration);
-                }
-            }
-
-            render(time, hours, minutes, seconds) {
-                this.element.innerHTML = '';
-                this.element.className = "flip-clock-wrapper medium animation-" + this.config.animationType + " orientation-" + this.config.orientation;
-                this.digitIdCounter = 0;
-
-                // Date
-                if (this.config.showDate) {
-                    const dateDiv = document.createElement("div");
-                    dateDiv.className = "flip-date";
-                    dateDiv.textContent = time.format(this.config.dateFormat);
-                    this.element.appendChild(dateDiv);
-                }
-
-                // Time container
-                const timeDiv = document.createElement("div");
-                timeDiv.className = "flip-time-container";
-
-                // Hours
-                timeDiv.appendChild(this.createFlipDigitPair(hours, "hours"));
-                timeDiv.appendChild(this.createSeparator());
-
-                // Minutes
-                timeDiv.appendChild(this.createFlipDigitPair(minutes, "minutes"));
-
-                // Seconds
-                if (this.config.showSeconds) {
-                    timeDiv.appendChild(this.createSeparator());
-                    timeDiv.appendChild(this.createFlipDigitPair(seconds, "seconds"));
-                }
-
-                // AM/PM
-                if (this.config.timeFormat === 12) {
-                    const ampm = document.createElement("div");
-                    ampm.className = "flip-ampm";
-                    ampm.textContent = time.format("A");
-                    timeDiv.appendChild(ampm);
-                }
-
-                this.element.appendChild(timeDiv);
-            }
-
-            createFlipDigitPair(value, unit) {
-                const container = document.createElement("div");
-                container.className = "flip-digit-pair";
-                
-                const digit1 = value.toString().charAt(0);
-                const digit2 = value.toString().charAt(1);
-
-                container.appendChild(this.createFlipDigit(digit1, unit + "-1"));
-                container.appendChild(this.createFlipDigit(digit2, unit + "-2"));
-
-                return container;
-            }
-
-            createFlipDigit(value, id) {
-                const digit = document.createElement("div");
-                digit.className = "flip-digit";
-                digit.id = this.elementId + "-" + id;
-                digit.dataset.value = value;
-
-                const top = document.createElement("div");
-                top.className = "flip-digit-top";
-                top.innerHTML = `<span>${value}</span>`;
-
-                const bottom = document.createElement("div");
-                bottom.className = "flip-digit-bottom";
-                bottom.innerHTML = `<span>${value}</span>`;
-
-                const flipTop = document.createElement("div");
-                flipTop.className = "flip-digit-flip flip-digit-flip-top";
-                flipTop.innerHTML = `<span>${value}</span>`;
-
-                const flipBottom = document.createElement("div");
-                flipBottom.className = "flip-digit-flip flip-digit-flip-bottom";
-                flipBottom.innerHTML = `<span>${value}</span>`;
-
-                digit.appendChild(top);
-                digit.appendChild(flipTop);
-                digit.appendChild(flipBottom);
-                digit.appendChild(bottom);
-
-                return digit;
-            }
-
-            createSeparator() {
-                const separator = document.createElement("div");
-                separator.className = "flip-separator";
-                separator.innerHTML = "<span>:</span>";
-                return separator;
-            }
+    // ── FlipClock class ─────────────────────────────────────────────────────
+    class FlipClock {
+        constructor(elementId, config) {
+            this.el      = document.getElementById(elementId);
+            this.id      = elementId;
+            this.cfg     = Object.assign({
+                timeFormat:    24,
+                showSeconds:   true,
+                showDate:      false,
+                dateFormat:    "dddd, MMMM D, YYYY",
+                animationType: "flip",
+                theme:         "dark",
+                size:          "medium",
+                orientation:   "horizontal",
+                blinkSeparator: false,
+            }, config);
+            this.prev = { hours: null, minutes: null, seconds: null };
+            this.first = true;
+            this._start();
         }
 
-        // Initialize clocks with different sizes and orientations
-        new FlipClock('clock-large', {
-            timeFormat: 24,
-            showSeconds: true,
-            showDate: true,
-            animationType: "flip",
-            orientation: "horizontal"
-        });
+        _start() {
+            this._tick();
+            const now = Date.now();
+            const delay = 1000 - (now % 1000);
+            setTimeout(() => {
+                this._tick();
+                setInterval(() => this._tick(), 1000);
+            }, delay);
+        }
 
-        new FlipClock('clock-medium', {
-            timeFormat: 24,
-            showSeconds: true,
-            showDate: true,
-            animationType: "flip",
-            orientation: "horizontal"
-        });
+        _tick() {
+            const t = moment();
+            const hours   = this.cfg.timeFormat === 12 ? t.format("hh") : t.format("HH");
+            const minutes = t.format("mm");
+            const seconds = t.format("ss");
 
-        new FlipClock('clock-small', {
-            timeFormat: 24,
-            showSeconds: true,
-            showDate: false,
-            animationType: "flip",
-            orientation: "horizontal"
-        });
+            if (this.first) {
+                this._render(t, hours, minutes, seconds);
+                this.prev = { hours, minutes, seconds };
+                this.first = false;
+                return;
+            }
 
-        new FlipClock('clock-12hr', {
-            timeFormat: 12,
-            showSeconds: true,
-            showDate: false,
-            animationType: "flip",
-            orientation: "horizontal"
-        });
+            if (hours   !== this.prev.hours)   this._flipPair(hours,   "hours");
+            if (minutes !== this.prev.minutes) this._flipPair(minutes, "minutes");
+            if (this.cfg.showSeconds && seconds !== this.prev.seconds)
+                this._flipPair(seconds, "seconds");
 
-        new FlipClock('clock-vertical', {
-            timeFormat: 24,
-            showSeconds: true,
-            showDate: true,
-            animationType: "flip",
-            orientation: "vertical"
-        });
+            // Update date text
+            const dateEl = this.el.querySelector(".flip-date");
+            if (dateEl) dateEl.textContent = t.format(this.cfg.dateFormat);
 
-        new FlipClock('clock-vertical-small', {
-            timeFormat: 24,
-            showSeconds: false,
-            showDate: false,
-            animationType: "flip",
-            orientation: "vertical"
+            // Update AM/PM
+            if (this.cfg.timeFormat === 12) {
+                const amEl = this.el.querySelector(".flip-ampm");
+                if (amEl) amEl.textContent = t.format("A");
+            }
+
+            this.prev = { hours, minutes, seconds };
+        }
+
+        _render(t, hours, minutes, seconds) {
+            this.el.innerHTML = '';
+            this.el.className = [
+                'flip-clock-wrapper',
+                this.cfg.size,
+                'theme-' + this.cfg.theme,
+                'animation-' + this.cfg.animationType,
+                'orientation-' + this.cfg.orientation,
+            ].join(' ');
+
+            if (this.cfg.showDate) {
+                const d = document.createElement('div');
+                d.className = 'flip-date';
+                d.textContent = t.format(this.cfg.dateFormat);
+                this.el.appendChild(d);
+            }
+
+            const tc = document.createElement('div');
+            tc.className = 'flip-time-container';
+
+            tc.appendChild(this._pair(hours,   'hours'));
+            tc.appendChild(this._sep());
+            tc.appendChild(this._pair(minutes, 'minutes'));
+
+            if (this.cfg.showSeconds) {
+                tc.appendChild(this._sep());
+                tc.appendChild(this._pair(seconds, 'seconds'));
+            }
+
+            if (this.cfg.timeFormat === 12) {
+                const ap = document.createElement('div');
+                ap.className = 'flip-ampm';
+                ap.textContent = t.format('A');
+                tc.appendChild(ap);
+            }
+
+            this.el.appendChild(tc);
+        }
+
+        _pair(value, unit) {
+            const c = document.createElement('div');
+            c.className = 'flip-digit-pair';
+            c.appendChild(this._digit(value.charAt(0), unit + '-1'));
+            c.appendChild(this._digit(value.charAt(1), unit + '-2'));
+            return c;
+        }
+
+        _digit(value, id) {
+            const d = document.createElement('div');
+            d.className = 'flip-digit';
+            d.id = this.id + '-' + id;
+            d.dataset.value = value;
+
+            const top = document.createElement('div');
+            top.className = 'flip-digit-top';
+            top.innerHTML = `<span>${value}</span>`;
+
+            const bot = document.createElement('div');
+            bot.className = 'flip-digit-bottom';
+            bot.innerHTML = `<span>${value}</span>`;
+
+            const ft = document.createElement('div');
+            ft.className = 'flip-digit-flip flip-digit-flip-top';
+            ft.innerHTML = `<span>${value}</span>`;
+
+            const fb = document.createElement('div');
+            fb.className = 'flip-digit-flip flip-digit-flip-bottom';
+            fb.innerHTML = `<span>${value}</span>`;
+
+            d.appendChild(top);
+            d.appendChild(ft);
+            d.appendChild(fb);
+            d.appendChild(bot);
+            return d;
+        }
+
+        _sep() {
+            const s = document.createElement('div');
+            s.className = 'flip-separator' + (this.cfg.blinkSeparator ? ' blink-separator' : '');
+            const d1 = document.createElement('div');
+            d1.className = 'flip-separator-dot';
+            const d2 = document.createElement('div');
+            d2.className = 'flip-separator-dot';
+            s.appendChild(d1);
+            s.appendChild(d2);
+            return s;
+        }
+
+        _flipPair(newValue, unit) {
+            this._flipDigit(newValue.charAt(0), unit + '-1');
+            this._flipDigit(newValue.charAt(1), unit + '-2');
+        }
+
+        _flipDigit(newValue, id) {
+            const el = document.getElementById(this.id + '-' + id);
+            if (!el || el.dataset.value === newValue) return;
+
+            const oldValue  = el.dataset.value;
+            const anim      = this.cfg.animationType;
+            const top       = el.querySelector('.flip-digit-top span');
+            const bot       = el.querySelector('.flip-digit-bottom span');
+            const flipTop   = el.querySelector('.flip-digit-flip-top span');
+            const flipBot   = el.querySelector('.flip-digit-flip-bottom span');
+
+            if (anim === 'flip') {
+                // Correct flip-clock mechanic:
+                // flipTop   = OLD digit, folds DOWN (0° → −90°)
+                // flipBottom = NEW digit, unfolds DOWN (90° → 0°)
+                // Static bottom pre-set to NEW for seamless reveal
+                if (flipTop) flipTop.textContent = oldValue;
+                if (flipBot) flipBot.textContent = newValue;
+                if (top)     top.textContent     = oldValue;
+                if (bot)     bot.textContent     = newValue;
+            } else {
+                if (top)     top.textContent     = newValue;
+                if (bot)     bot.textContent     = newValue;
+                if (flipTop) flipTop.textContent = newValue;
+                if (flipBot) flipBot.textContent = newValue;
+            }
+
+            const cls = { flip:'flipping', fade:'fading', slide:'sliding',
+                          zoom:'zooming', roll:'rolling' }[anim] || 'changing';
+            const dur = { flip:600, fade:400, slide:400, zoom:400, roll:600 }[anim] || 0;
+
+            el.classList.remove('flipping','fading','sliding','zooming','rolling','changing');
+            void el.offsetWidth;
+            el.classList.add(cls);
+
+            // At midpoint of flip, swap static top to new value (flipTop is now invisible)
+            if (anim === 'flip') {
+                setTimeout(() => { if (top) top.textContent = newValue; }, 300);
+            }
+
+            setTimeout(() => {
+                el.classList.remove(cls);
+                if (top) top.textContent = newValue;
+                if (bot) bot.textContent = newValue;
+                el.dataset.value = newValue;
+            }, dur);
+        }
+
+        // Hot-swap config without full re-render
+        setConfig(patch) {
+            Object.assign(this.cfg, patch);
+            const t = moment();
+            const hours   = this.cfg.timeFormat === 12 ? t.format("hh") : t.format("HH");
+            const minutes = t.format("mm");
+            const seconds = t.format("ss");
+            this._render(t, hours, minutes, seconds);
+            this.prev = { hours, minutes, seconds };
+        }
+    }
+
+    // ── Instantiate main interactive clock ──────────────────────────────────
+    const mainClock = new FlipClock('main-clock', {
+        showDate: true,
+        animationType: 'flip',
+        theme: 'dark',
+        size: 'medium',
+        blinkSeparator: false,
+    });
+
+    // ── Instantiate showcase (theme row) ────────────────────────────────────
+    ['dark','light','amber','green','blue'].forEach(theme => {
+        new FlipClock('sc-' + theme, {
+            theme,
+            showDate:      false,
+            showSeconds:   false,
+            blinkSeparator: false,
         });
+    });
+
+    // ── Control button wiring ────────────────────────────────────────────────
+    function activateBtn(groupId, attr, val) {
+        document.querySelectorAll('#' + groupId + ' button').forEach(b => {
+            b.classList.toggle('active', b.dataset[attr] === val);
+        });
+    }
+
+    document.querySelectorAll('#anim-btns button').forEach(b => {
+        b.addEventListener('click', () => {
+            mainClock.setConfig({ animationType: b.dataset.anim });
+            activateBtn('anim-btns', 'anim', b.dataset.anim);
+        });
+    });
+
+    document.querySelectorAll('#theme-btns button').forEach(b => {
+        b.addEventListener('click', () => {
+            mainClock.setConfig({ theme: b.dataset.theme });
+            activateBtn('theme-btns', 'theme', b.dataset.theme);
+        });
+    });
+
+    document.querySelectorAll('#size-btns button').forEach(b => {
+        b.addEventListener('click', () => {
+            mainClock.setConfig({ size: b.dataset.size });
+            activateBtn('size-btns', 'size', b.dataset.size);
+        });
+    });
+
+    const toggles = {
+        'toggle-seconds':  () => { mainClock.cfg.showSeconds  = !mainClock.cfg.showSeconds;  return mainClock.cfg.showSeconds; },
+        'toggle-date':     () => { mainClock.cfg.showDate     = !mainClock.cfg.showDate;      return mainClock.cfg.showDate; },
+        'toggle-blink':    () => { mainClock.cfg.blinkSeparator = !mainClock.cfg.blinkSeparator; return mainClock.cfg.blinkSeparator; },
+        'toggle-12hr':     () => { mainClock.cfg.timeFormat   = mainClock.cfg.timeFormat === 12 ? 24 : 12; return mainClock.cfg.timeFormat === 12; },
+        'toggle-vertical': () => { mainClock.cfg.orientation  = mainClock.cfg.orientation === 'vertical' ? 'horizontal' : 'vertical'; return mainClock.cfg.orientation === 'vertical'; },
+    };
+    const toggleLabels = {
+        'toggle-seconds':  ['Seconds ✗', 'Seconds ✓'],
+        'toggle-date':     ['Date ✗',    'Date ✓'],
+        'toggle-blink':    ['Blink ✗',   'Blink ✓'],
+        'toggle-12hr':     ['12-hr ✗',   '12-hr ✓'],
+        'toggle-vertical': ['Vertical ✗','Vertical ✓'],
+    };
+
+    Object.keys(toggles).forEach(id => {
+        const btn = document.getElementById(id);
+        btn.addEventListener('click', () => {
+            const on = toggles[id]();
+            btn.textContent = toggleLabels[id][on ? 1 : 0];
+            btn.classList.toggle('active', on);
+            const t = moment();
+            const hours   = mainClock.cfg.timeFormat === 12 ? t.format("hh") : t.format("HH");
+            const minutes = t.format("mm");
+            const seconds = t.format("ss");
+            mainClock._render(t, hours, minutes, seconds);
+            mainClock.prev = { hours, minutes, seconds };
+        });
+    });
     </script>
 </body>
 </html>

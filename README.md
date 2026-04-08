@@ -1,18 +1,21 @@
 # MMM-FlipFlopClock
 
-A beautiful, classic flip clock module for MagicMirror². This module displays the current time with an elegant flip animation, reminiscent of vintage flip clocks.
+A beautiful, classic flip clock module for MagicMirror². Displays the current time with an authentic 3D flip animation that faithfully recreates the look and feel of vintage split-flap clocks.
 
 ![Flip Clock Preview](https://github.com/user-attachments/assets/c3263d99-6be8-4ab6-a68a-faa4510cc7a4)
 
 ## Features
 
-- ⏰ Classic flip clock design with smooth animations
-- 🎨 Customizable colors and sizes
-- 🕐 Support for both 12-hour and 24-hour time formats
-- ⚙️ Optional seconds display
-- 📅 Optional date display
-- 📱 Responsive design
-- 🎭 Multiple animation styles: flip, fade, slide, zoom, roll, or none
+- ⏰ **Authentic flip animation** – corrected 3D fold-shadow mechanic (top flap shows old digit falling, bottom flap reveals new digit appearing)
+- 🎨 **Five built-in themes** – dark, light, amber, green, blue (via CSS custom properties – fully overridable)
+- 📐 **Four sizes** – small, medium, large, xlarge
+- 🕐 **12 / 24-hour format** with optional AM/PM indicator
+- ⚙️ **Configurable** – seconds, date, blinking separator, vertical orientation, custom timezone
+- 🎭 **Six animation styles** – flip, fade, slide, zoom, roll, none
+- 📱 **Responsive** – adapts to smaller screens automatically
+- 🔤 **CSS custom properties** – easy to theme without touching source files
+
+---
 
 ## Installation
 
@@ -28,16 +31,16 @@ git clone https://github.com/matskkolstad/MMM-FlipFlopClock.git
 
 3. Add the module to your `config/config.js` file (see configuration below).
 
-## Configuration
+---
 
-Add the module to the modules array in your `config/config.js` file:
+## Configuration
 
 ```javascript
 {
     module: "MMM-FlipFlopClock",
-    position: "top_center", // or any other valid position
+    position: "top_center",
     config: {
-        // See below for configuration options
+        // see options below
     }
 }
 ```
@@ -46,17 +49,22 @@ Add the module to the modules array in your `config/config.js` file:
 
 | Option | Type | Default | Description |
 |--------|------|---------|-------------|
-| `timeFormat` | `Number` | `24` | Use `12` or `24` hour format |
-| `showSeconds` | `Boolean` | `true` | Display seconds |
-| `showDate` | `Boolean` | `true` | Display date above the clock |
-| `dateFormat` | `String` | `"dddd, MMMM D, YYYY"` | Date format (using Moment.js format) |
-| `size` | `String` | `"medium"` | Size of the clock: `"small"`, `"medium"`, or `"large"` |
-| `animationType` | `String` | `"flip"` | Animation style for time transitions: `"flip"`, `"fade"`, `"slide"`, `"zoom"`, `"roll"`, or `"none"` |
-| `orientation` | `String` | `"horizontal"` | Layout orientation: `"horizontal"` or `"vertical"` |
+| `timeFormat` | `Number` | `24` | `12` or `24` hour format |
+| `showSeconds` | `Boolean` | `true` | Show seconds |
+| `showDate` | `Boolean` | `true` | Show date above the clock |
+| `dateFormat` | `String` | `"dddd, MMMM D, YYYY"` | Moment.js date format string |
+| `size` | `String` | `"medium"` | `"small"` · `"medium"` · `"large"` · `"xlarge"` |
+| `animationType` | `String` | `"flip"` | `"flip"` · `"fade"` · `"slide"` · `"zoom"` · `"roll"` · `"none"` |
+| `orientation` | `String` | `"horizontal"` | `"horizontal"` or `"vertical"` |
+| `theme` | `String` | `"dark"` | `"dark"` · `"light"` · `"amber"` · `"green"` · `"blue"` |
+| `blinkSeparator` | `Boolean` | `false` | Blink the colon separators every second |
+| `timezone` | `String` | `null` | IANA timezone string, e.g. `"America/New_York"` *(requires moment-timezone)* |
 
-### Example Configuration
+---
 
-#### Minimal Configuration (using defaults)
+### Example Configurations
+
+#### Minimal (all defaults)
 ```javascript
 {
     module: "MMM-FlipFlopClock",
@@ -64,207 +72,185 @@ Add the module to the modules array in your `config/config.js` file:
 }
 ```
 
-#### Custom Configuration
+#### Large amber clock, 12-hour, blinking separator
 ```javascript
 {
     module: "MMM-FlipFlopClock",
     position: "middle_center",
     config: {
-        timeFormat: 12,
-        showSeconds: true,
-        showDate: true,
-        dateFormat: "dddd, MMMM D",
-        size: "large",
-        animationType: "fade"
+        timeFormat:      12,
+        showDate:        true,
+        dateFormat:      "dddd, MMMM D",
+        size:            "large",
+        theme:           "amber",
+        blinkSeparator:  true,
     }
 }
 ```
 
-#### Minimal Clock (no date, no seconds)
+#### Minimal green clock (no date, fade animation)
 ```javascript
 {
     module: "MMM-FlipFlopClock",
     position: "top_center",
     config: {
-        showSeconds: false,
-        showDate: false,
-        size: "medium"
+        showSeconds:   false,
+        showDate:      false,
+        theme:         "green",
+        animationType: "fade",
     }
 }
 ```
 
-#### With Different Animations
+#### XLarge blue vertical clock
 ```javascript
-// Smooth fade animation
-{
-    module: "MMM-FlipFlopClock",
-    position: "top_center",
-    config: {
-        animationType: "fade"
-    }
-}
-
-// Slide animation
-{
-    module: "MMM-FlipFlopClock",
-    position: "top_center",
-    config: {
-        animationType: "slide"
-    }
-}
-
-// No animation (instant change)
-{
-    module: "MMM-FlipFlopClock",
-    position: "top_center",
-    config: {
-        animationType: "none"
-    }
-}
-
-// Vertical orientation
 {
     module: "MMM-FlipFlopClock",
     position: "top_left",
     config: {
-        orientation: "vertical"
+        size:        "xlarge",
+        theme:       "blue",
+        orientation: "vertical",
     }
 }
 ```
 
-## Date Format Options
+#### Remote timezone (e.g. a second clock showing New York time)
+```javascript
+{
+    module: "MMM-FlipFlopClock",
+    position: "bottom_right",
+    config: {
+        showSeconds: false,
+        showDate:    false,
+        size:        "medium",
+        theme:       "light",
+        timezone:    "America/New_York",
+    }
+}
+```
 
-The `dateFormat` option uses Moment.js formatting. Here are some common examples:
+---
 
-- `"dddd, MMMM D, YYYY"` → Tuesday, January 7, 2026
-- `"ddd, MMM D"` → Tue, Jan 7
-- `"LL"` → January 7, 2026
-- `"MMMM D"` → January 7
-- `"DD.MM.YYYY"` → 07.01.2026
+## Themes
 
-See the [Moment.js documentation](https://momentjs.com/docs/#/displaying/format/) for more format options.
+Five themes are included, each defined entirely with CSS custom properties so you can override individual variables in your own stylesheet without forking the module.
+
+| Theme | Background | Digit colour |
+|-------|-----------|--------------|
+| `dark` (default) | Charcoal gradient | White |
+| `light` | Light grey gradient | Near-black |
+| `amber` | Deep brown | Amber / orange |
+| `green` | Deep green | Neon green |
+| `blue` | Deep navy | Sky blue |
+
+**Custom theme example** (add to your MagicMirror `custom.css`):
+```css
+.flip-clock-wrapper.theme-dark {
+    --ffc-card-top:   linear-gradient(180deg, #1a0030 0%, #0d001e 100%);
+    --ffc-card-bot:   linear-gradient(180deg, #0d001e 0%, #080014 100%);
+    --ffc-text-color: #cc88ff;
+    --ffc-sep-color:  #8844cc;
+}
+```
+
+---
 
 ## Animation Types
 
-The module supports several animation styles for time transitions:
+| Type | Description |
+|------|-------------|
+| `flip` | Authentic split-flap card flip: old digit folds down (0° → −90°) while new digit unfolds (90° → 0°), with fold-shadow shading |
+| `fade` | Cross-fade: digits fade out then fade in |
+| `slide` | Digits slide upward out of frame, then slide in from below |
+| `zoom` | Digits zoom out then zoom back in |
+| `roll` | Barrel-roll on the Y axis (3D horizontal flip) |
+| `none` | Instant change, no animation |
 
-- **`flip`** (default) - Classic flip clock animation with 3D rotation effect, reminiscent of vintage flip clocks
-- **`fade`** - Smooth fade transition where digits fade out and fade in with the new value
-- **`slide`** - Digits slide down and fade out, creating a smooth downward motion
-- **`zoom`** - Digits zoom out and zoom back in with the new value
-- **`roll`** - Digits roll horizontally with a 3D rotation effect
-- **`none`** - Instant change with no animation for minimal visual distraction
+---
 
-You can set the animation type in your configuration:
+## Date Format
 
-```javascript
-{
-    module: "MMM-FlipFlopClock",
-    position: "top_center",
-    config: {
-        animationType: "fade" // Choose your preferred animation
-    }
-}
-```
+Uses [Moment.js format tokens](https://momentjs.com/docs/#/displaying/format/):
 
-## Orientation Options
+| Format string | Example output |
+|--------------|----------------|
+| `"dddd, MMMM D, YYYY"` | Tuesday, January 7, 2026 |
+| `"ddd, MMM D"` | Tue, Jan 7 |
+| `"DD.MM.YYYY"` | 07.01.2026 |
+| `"MMMM D"` | January 7 |
 
-The clock supports two orientation modes to fit different placements on your MagicMirror:
+---
 
-- **`horizontal`** (default) - Traditional layout with time displayed horizontally (HH:MM:SS)
-- **`vertical`** - Stacked layout with time components displayed vertically, perfect for narrow spaces or side positions
+## Vertical Orientation
 
-In vertical mode:
-- Time units stack vertically (hours, then minutes, then seconds if enabled)
-- Separators (colons) are hidden for a cleaner look
-- Date remains at the top (if enabled)
-- AM/PM indicator appears below the time (if using 12-hour format)
+In vertical mode the hours, minutes (and seconds) stack vertically instead of side-by-side. Separators are hidden. AM/PM appears below the time.
 
-Example vertical configuration:
-
-```javascript
-{
-    module: "MMM-FlipFlopClock",
-    position: "top_left",
-    config: {
-        orientation: "vertical",
-        size: "medium"
-    }
-}
-```
-
-## Screenshots
-
-The screenshot above shows all the different configurations available:
-
-- **Large Size with Date (24-hour)** - Perfect for a main display with full date information
-- **Medium Size (Default)** - Balanced size with date display  
-- **Small Size without Date** - Compact time-only display
-- **12-Hour Format with AM/PM** - Classic 12-hour format with AM/PM indicator
-- **Vertical Orientation** - Stacked layout for narrow spaces
-
-All sizes and orientations feature the classic flip clock design with smooth animations between time changes.
-
-## Styling
-
-The module uses CSS variables and can be further customized by editing the `MMM-FlipFlopClock.css` file. The animations create smooth transitions between time changes:
-
-- **Flip**: Realistic card-flipping effect with 3D rotation, subtle shadow effects, gradient backgrounds, and shine effect
-- **Fade**: Simple opacity transition for a subtle effect
-- **Slide**: Downward sliding motion with fade
-- **Zoom**: Scale transformation for a dynamic effect
-- **Roll**: Horizontal 3D rotation for a unique look
-- **None**: Instant update for minimal distraction
+---
 
 ## Technical Details
 
-- Built with vanilla JavaScript (no external dependencies except Moment.js)
-- Uses CSS3 3D transforms for flip animations
-- Updates every second
-- Lightweight and performant
+- Vanilla JavaScript – no dependencies beyond Moment.js (already bundled with MagicMirror²)
+- Optional `timezone` support via [moment-timezone](https://momentjs.com/timezone/) when present
+- Timer aligned to the next whole-second boundary for accurate ticking
+- CSS custom properties for theming – no inline styles
+- Fold-shadow animation uses CSS `::after` pseudo-elements, keeping the markup clean
+
+---
 
 ## Troubleshooting
 
-**Clock not showing up:**
-- Check that the module is correctly added to your `config.js`
-- Verify that the module folder is in the `modules` directory
-- Check the MagicMirror logs for errors: `pm2 logs mm`
+**Clock not showing:**
+- Verify the module folder exists in `~/MagicMirror/modules/`
+- Check MagicMirror logs: `pm2 logs mm`
 
-**Animation not smooth:**
-- This may be due to hardware limitations
-- Try reducing the size to "small"
-- Ensure your Raspberry Pi or device has hardware acceleration enabled
+**Flip animation looks wrong / not 3D:**
+- Ensure the browser / Electron has GPU acceleration enabled
+- Try a different `animationType` such as `"fade"` to confirm the module is loading
+
+**Timezone not applying:**
+- Install `moment-timezone`: `cd ~/MagicMirror && npm install moment-timezone`
+- Provide a valid IANA zone string (e.g. `"Europe/Oslo"`)
+
+---
 
 ## Contributing
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+Pull requests are welcome! Please open an issue first to discuss major changes.
+
+---
 
 ## License
 
-This project is licensed under the MIT License.
+MIT – see [LICENSE](LICENSE).
+
+---
 
 ## Credits
 
 - Developed by Mats Kjoshagen Kolstad
-- Inspired by classic flip clocks
+- Inspired by classic split-flap (Solari) display clocks
+
+---
 
 ## Changelog
 
-### Version 1.2.0 (2026-01-08)
-- Added orientation option for horizontal or vertical layout
-- Default orientation is horizontal for backward compatibility
-- Vertical mode ideal for narrow spaces and side positions
-- Updated documentation with orientation examples
+### Version 1.3.0
+- **Fixed** authentic flip-clock animation: top flap now shows the OLD digit folding away; bottom flap shows the NEW digit unfolding — exactly as a real Solari board works
+- **Added** fold-shadow `::after` overlays on flip panels for realistic 3D depth
+- **Added** `theme` option with five built-in themes (dark, light, amber, green, blue) implemented as CSS custom properties
+- **Added** `blinkSeparator` option — separator dots pulse every second
+- **Added** `timezone` option — display time in any IANA timezone (requires moment-timezone)
+- **Added** `xlarge` size
+- **Changed** separator from a colon character to two dots (classic Solari style); crease-glow highlight during flip
+- **Changed** timer now aligns to next whole-second boundary for accurate ticking
+- **Improved** demo page with live controls for animation, theme, size, and toggles
 
-### Version 1.1.0 (2026-01-08)
-- Added multiple animation types for time transitions
-- New animation options: fade, slide, zoom, roll, and none
-- Flip animation remains the default
-- Updated documentation with animation examples
+### Version 1.2.0
+- Added `orientation` option (horizontal / vertical)
 
-### Version 1.0.0 (2026-01-07)
+### Version 1.1.0
+- Added multiple animation types (fade, slide, zoom, roll, none)
+
+### Version 1.0.0
 - Initial release
-- Basic flip clock functionality
-- Configurable time and date display
-- Three size options
-- 12/24 hour format support
