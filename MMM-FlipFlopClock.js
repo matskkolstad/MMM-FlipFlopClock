@@ -8,13 +8,16 @@
 Module.register("MMM-FlipFlopClock", {
 	// Default module config
 	defaults: {
-		timeFormat: 24, // 12 or 24 hour format
+		timeFormat: 24,        // 12 or 24
 		showSeconds: true,
 		showDate: true,
 		dateFormat: "dddd, MMMM D, YYYY",
-		size: "medium", // "small", "medium", "large"
-		animationType: "flip", // "flip", "fade", "slide", "none", "zoom", "roll"
+		size: "medium",        // "small", "medium", "large", "xlarge"
+		animationType: "flip", // "flip", "fade", "slide", "zoom", "roll", "none"
 		orientation: "horizontal", // "horizontal", "vertical"
+		theme: "dark",         // "dark", "light", "amber", "green", "blue"
+		blinkSeparator: false, // blink colon every second
+		timezone: null,        // e.g. "America/New_York" – requires moment-timezone
 	},
 
 	// Required scripts
@@ -32,102 +35,91 @@ Module.register("MMM-FlipFlopClock", {
 		Log.info("Starting module: " + this.name);
 		this.time = null;
 		this.date = null;
-		this.prevTime = {
-			hours: null,
-			minutes: null,
-			seconds: null
-		};
+		this.prevTime = { hours: null, minutes: null, seconds: null };
 		this.isFirstRender = true;
-		
-		// Schedule update interval
 		this.scheduleUpdate();
 	},
 
 	// Override dom generator
 	getDom: function() {
 		const wrapper = document.createElement("div");
-		wrapper.className = "flip-clock-wrapper " + this.config.size + " animation-" + this.config.animationType + " orientation-" + this.config.orientation;
+		wrapper.className = [
+			"flip-clock-wrapper",
+			this.config.size,
+			"animation-" + this.config.animationType,
+			"orientation-" + this.config.orientation,
+			"theme-" + this.config.theme,
+		].join(" ");
 
-		// Create date display if enabled
+		// Date display
 		if (this.config.showDate && this.date) {
 			const dateDiv = document.createElement("div");
 			dateDiv.className = "flip-date";
-			dateDiv.innerHTML = this.date;
+			dateDiv.textContent = this.date;
 			wrapper.appendChild(dateDiv);
 		}
 
-		// Create time display
+		// Time display
 		const timeDiv = document.createElement("div");
 		timeDiv.className = "flip-time-container";
 
 		const time = this.time || moment();
-		const hours = this.config.timeFormat === 12 ? time.format("hh") : time.format("HH");
+		const hours   = this.config.timeFormat === 12 ? time.format("hh") : time.format("HH");
 		const minutes = time.format("mm");
 		const seconds = time.format("ss");
 
-		// Hours
 		timeDiv.appendChild(this.createFlipDigitPair(hours, "hours"));
-		
-		// Separator
 		timeDiv.appendChild(this.createSeparator());
-		
-		// Minutes
 		timeDiv.appendChild(this.createFlipDigitPair(minutes, "minutes"));
 
-		// Seconds (if enabled)
 		if (this.config.showSeconds) {
 			timeDiv.appendChild(this.createSeparator());
 			timeDiv.appendChild(this.createFlipDigitPair(seconds, "seconds"));
 		}
 
-		// AM/PM indicator for 12-hour format
 		if (this.config.timeFormat === 12) {
 			const ampm = document.createElement("div");
 			ampm.className = "flip-ampm";
-			ampm.innerHTML = time.format("A");
+			ampm.textContent = time.format("A");
 			timeDiv.appendChild(ampm);
 		}
 
 		wrapper.appendChild(timeDiv);
-
 		return wrapper;
 	},
 
-	// Create a pair of flip digits
+	// Create a pair of flip digits for a given value ("HH", "mm", "ss")
 	createFlipDigitPair: function(value, unit) {
 		const container = document.createElement("div");
 		container.className = "flip-digit-pair";
-		
-		const digit1 = value.toString().charAt(0);
-		const digit2 = value.toString().charAt(1);
-
-		container.appendChild(this.createFlipDigit(digit1, unit + "-1"));
-		container.appendChild(this.createFlipDigit(digit2, unit + "-2"));
-
+		container.appendChild(this.createFlipDigit(value.charAt(0), unit + "-1"));
+		container.appendChild(this.createFlipDigit(value.charAt(1), unit + "-2"));
 		return container;
 	},
 
-	// Create a single flip digit
+	// Create one flip digit tile
 	createFlipDigit: function(value, id) {
 		const digit = document.createElement("div");
 		digit.className = "flip-digit";
 		digit.id = this.identifier + "-" + id;
+		digit.dataset.value = value;
 
-		// Top half
+		// Static top half – shows the upper portion of the current digit
 		const top = document.createElement("div");
 		top.className = "flip-digit-top";
 		top.innerHTML = `<span>${value}</span>`;
 
-		// Bottom half
+		// Static bottom half – shows the lower portion of the current digit
 		const bottom = document.createElement("div");
 		bottom.className = "flip-digit-bottom";
 		bottom.innerHTML = `<span>${value}</span>`;
 
-		// Flip animation elements
+		// Animated flap: top → folds DOWN (shows the OLD digit folding away)
 		const flipTop = document.createElement("div");
 		flipTop.className = "flip-digit-flip flip-digit-flip-top";
 		flipTop.innerHTML = `<span>${value}</span>`;
 
+		// Animated flap: bottom → unfolds DOWN (shows the NEW digit appearing)
 		const flipBottom = document.createElement("div");
 		flipBottom.className = "flip-digit-flip flip-digit-flip-bottom";
 		flipBottom.innerHTML = `<span>${value}</span>`;
@@ -137,170 +129,155 @@ Module.register("MMM-FlipFlopClock", {
 		digit.appendChild(flipBottom);
 		digit.appendChild(bottom);
 
-		// Store current value as data attribute
-		digit.dataset.value = value;
-
 		return digit;
 	},
 
-	// Create separator (colon)
+	// Create a separator element (two dots, matching classic flip-clock look)
 	createSeparator: function() {
 		const separator = document.createElement("div");
-		separator.className = "flip-separator";
-		separator.innerHTML = "<span>:</span>";
+		separator.className = "flip-separator" + (this.config.blinkSeparator ? " blink-separator" : "");
+
+		const dot1 = document.createElement("div");
+		dot1.className = "flip-separator-dot";
+		const dot2 = document.createElement("div");
+		dot2.className = "flip-separator-dot";
+
+		separator.appendChild(dot1);
+		separator.appendChild(dot2);
 		return separator;
 	},
 
-	// Schedule the next update
-	scheduleUpdate: function(delay) {
-		let nextLoad = 1000; // Update every second
-		if (typeof delay !== "undefined" && delay >= 0) {
-			nextLoad = delay;
-		}
-
+	// Schedule the next update, aligned to the next whole second
+	scheduleUpdate: function() {
 		const self = this;
+		const now = Date.now();
+		const delay = 1000 - (now % 1000);
 		setTimeout(function() {
 			self.updateTime();
-		}, nextLoad);
+		}, delay);
 	},
 
-	// Update the time
+	// Fetch current time and animate changed digits
 	updateTime: function() {
-		this.time = moment();
+		// Use moment-timezone when available; falls back to local time if the
+		// library is not loaded or the timezone string is not set.
+		if (this.config.timezone && moment.tz) {
+			this.time = moment().tz(this.config.timezone);
+		} else {
+			this.time = moment();
+		}
 		this.date = this.time.format(this.config.dateFormat);
 
-		const hours = this.config.timeFormat === 12 ? this.time.format("hh") : this.time.format("HH");
+		const hours   = this.config.timeFormat === 12 ? this.time.format("hh") : this.time.format("HH");
 		const minutes = this.time.format("mm");
 		const seconds = this.time.format("ss");
 
-		// Check if we need to flip any digits
-		const needsUpdate = 
-			hours !== this.prevTime.hours ||
-			minutes !== this.prevTime.minutes ||
-			(this.config.showSeconds && seconds !== this.prevTime.seconds);
-
-		if (needsUpdate) {
-			this.animateFlip(hours, minutes, seconds);
+		if (this.isFirstRender) {
+			this.updateDom(0);
+			this.isFirstRender = false;
 			this.prevTime = { hours, minutes, seconds };
+			this.scheduleUpdate();
+			return;
 		}
 
-		this.scheduleUpdate();
-	},
-
-	// Animate the flip transition
-	animateFlip: function(hours, minutes, seconds) {
-		const self = this;
-
-		// Flip hours if changed
 		if (hours !== this.prevTime.hours && this.prevTime.hours !== null) {
 			this.flipDigitPair(hours, "hours");
 		}
-
-		// Flip minutes if changed
 		if (minutes !== this.prevTime.minutes && this.prevTime.minutes !== null) {
 			this.flipDigitPair(minutes, "minutes");
 		}
-
-		// Flip seconds if changed and enabled
 		if (this.config.showSeconds && seconds !== this.prevTime.seconds && this.prevTime.seconds !== null) {
 			this.flipDigitPair(seconds, "seconds");
 		}
 
-		// Update AM/PM if using 12-hour format (no animation needed)
+		// Update date text without re-rendering the whole DOM
+		const dateEl = document.querySelector("#" + this.identifier + " .flip-date");
+		if (dateEl) {
+			dateEl.textContent = this.date;
+		}
+
+		// Update AM/PM text
 		if (this.config.timeFormat === 12) {
-			const ampmElement = document.querySelector("#" + this.identifier + " .flip-ampm");
-			if (ampmElement) {
-				ampmElement.textContent = this.time.format("A");
-			}
+			const ampmEl = document.querySelector("#" + this.identifier + " .flip-ampm");
+			if (ampmEl) ampmEl.textContent = this.time.format("A");
 		}
 
-		// Only do a full DOM update on first render
-		if (this.isFirstRender) {
-			this.updateDom(0);
-			this.isFirstRender = false;
-		}
+		this.prevTime = { hours, minutes, seconds };
+		this.scheduleUpdate();
 	},
 
-	// Flip a pair of digits
+	// Animate both digits in a pair
 	flipDigitPair: function(newValue, unit) {
-		const digit1 = newValue.toString().charAt(0);
-		const digit2 = newValue.toString().charAt(1);
-		
-		this.flipSingleDigit(digit1, unit + "-1");
-		this.flipSingleDigit(digit2, unit + "-2");
+		this.flipSingleDigit(newValue.charAt(0), unit + "-1");
+		this.flipSingleDigit(newValue.charAt(1), unit + "-2");
 	},
 
-	// Flip a single digit
+	// Animate a single digit tile
 	flipSingleDigit: function(newValue, id) {
-		const digitId = this.identifier + "-" + id;
-		const digit = document.getElementById(digitId);
-		
-		if (digit && digit.dataset.value !== newValue) {
-			const oldValue = digit.dataset.value;
-			const animationType = this.config.animationType;
+		const digitEl = document.getElementById(this.identifier + "-" + id);
+		if (!digitEl || digitEl.dataset.value === newValue) return;
 
-			const top = digit.querySelector(".flip-digit-top span");
-			const bottom = digit.querySelector(".flip-digit-bottom span");
-			const flipTop = digit.querySelector(".flip-digit-flip-top span");
-			const flipBottom = digit.querySelector(".flip-digit-flip-bottom span");
+		const oldValue     = digitEl.dataset.value;
+		const animType     = this.config.animationType;
+		const top          = digitEl.querySelector(".flip-digit-top span");
+		const bottom       = digitEl.querySelector(".flip-digit-bottom span");
+		const flipTop      = digitEl.querySelector(".flip-digit-flip-top span");
+		const flipBottom   = digitEl.querySelector(".flip-digit-flip-bottom span");
 
-			// Default to classic flip behavior
-			if (animationType === "flip") {
-				// Static halves start on OLD value; overlays show NEW value immediately so the new digit is visible during the flip
-				if (top) top.textContent = oldValue;
-				if (bottom) bottom.textContent = oldValue;
-
-				// New value travels on both flip faces for a forward-facing flip
-				if (flipTop) flipTop.textContent = newValue;
-				if (flipBottom) flipBottom.textContent = newValue;
-			} else {
-				// Non-flip animations: simply set new value on static halves
-				if (top) top.textContent = newValue;
-				if (bottom) bottom.textContent = newValue;
-				if (flipTop) flipTop.textContent = newValue;
-				if (flipBottom) flipBottom.textContent = newValue;
-			}
-
-			// Add appropriate animation class based on animationType
-			const animationClass = animationType === "flip" ? "flipping" :
-			                       animationType === "fade" ? "fading" :
-			                       animationType === "slide" ? "sliding" :
-			                       animationType === "zoom" ? "zooming" :
-			                       animationType === "roll" ? "rolling" : "changing";
-
-			// Reset any previous animation classes before re-triggering
-			digit.classList.remove("flipping", "fading", "sliding", "zooming", "rolling", "changing");
-			// Force reflow so the class re-application reliably restarts the animation
-			void digit.offsetWidth;
-
-			digit.classList.add(animationClass);
-
-			// Determine animation duration based on type (ms)
-			const animationDuration = animationType === "none" ? 0 :
-			                          animationType === "fade" ? 400 :
-			                          animationType === "slide" ? 400 :
-			                          animationType === "zoom" ? 400 :
-			                          animationType === "roll" ? 600 :
-			                          600; // flip default
-
-			// For the flip animation, swap the top half to the new value halfway through
-			if (animationType === "flip") {
-				setTimeout(function() {
-					if (top) top.textContent = newValue;
-				}, 300); // matches flipTop 0.3s duration
-			}
-
-			// Finalize after animation completes
-			setTimeout(function() {
-				digit.classList.remove(animationClass);
-
-				// Ensure both static halves end on the new value
-				if (top) top.textContent = newValue;
-				if (bottom) bottom.textContent = newValue;
-
-				// Update data attribute
-				digit.dataset.value = newValue;
-			}, animationDuration);
+		if (animType === "flip") {
+			// ── Classic flip-clock mechanic ──────────────────────────────────
+			// flipTop   shows the OLD digit and folds DOWN (rotates 0° → −90°)
+			// flipBottom shows the NEW digit and unfolds DOWN (rotates 90° → 0°)
+			// The static bottom is pre-set to NEW so it matches when flipBottom
+			// finishes and the flap becomes invisible again.
+			if (flipTop)   flipTop.textContent   = oldValue;
+			if (flipBottom) flipBottom.textContent = newValue;
+			if (top)       top.textContent       = oldValue;
+			if (bottom)    bottom.textContent    = newValue; // pre-set for seamless reveal
+		} else {
+			// Non-flip animations: update all faces to NEW immediately
+			if (top)       top.textContent       = newValue;
+			if (bottom)    bottom.textContent    = newValue;
+			if (flipTop)   flipTop.textContent   = newValue;
+			if (flipBottom) flipBottom.textContent = newValue;
 		}
-	}
+
+		const animClass = {
+			flip:  "flipping",
+			fade:  "fading",
+			slide: "sliding",
+			zoom:  "zooming",
+			roll:  "rolling",
+		}[animType] || "changing";
+
+		// Remove any lingering class, force reflow, re-apply
+		digitEl.classList.remove("flipping", "fading", "sliding", "zooming", "rolling", "changing");
+		void digitEl.offsetWidth;
+		digitEl.classList.add(animClass);
+
+		const duration = { flip: 600, fade: 400, slide: 400, zoom: 400, roll: 600 }[animType] || 0;
+
+		// At the halfway point of a flip, swap static top to the new digit
+		// (flipTop is at -90° / invisible at this moment)
+		if (animType === "flip") {
+			const _top = top;
+			const _new = newValue;
+			setTimeout(function() {
+				if (_top) _top.textContent = _new;
+			}, 300);
+		}
+
+		// Finalise after the animation completes
+		const _digitEl  = digitEl;
+		const _animClass = animClass;
+		const _top      = top;
+		const _bottom   = bottom;
+		const _newValue = newValue;
+		setTimeout(function() {
+			_digitEl.classList.remove(_animClass);
+			if (_top)    _top.textContent    = _newValue;
+			if (_bottom) _bottom.textContent = _newValue;
+			_digitEl.dataset.value = _newValue;
+		}, duration);
+	},
 });
